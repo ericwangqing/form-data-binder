@@ -13,11 +13,11 @@
       var i$, len$, pair;
       for (i$ = 0, len$ = pairs.length; i$ < len$; ++i$) {
         pair = pairs[i$];
-        this.setValue(pair.name, pair.value, data);
+        this.setDataValue(pair.name, pair.value, data);
       }
       return data;
     },
-    setValue: function(path, value, data){
+    setDataValue: function(path, value, data){
       var levels, obj, i$, len$, i, level, matches, __all__, attr, index, results$ = [];
       path = path.trim();
       if (!pathValidationRegex.test(path)) {
@@ -85,6 +85,64 @@
           results$.push(i$);
         }
         return results$;
+      }
+    },
+    d2f: function(data, selector){
+      var form;
+      form = $(selector);
+      this.setFormWithData(form, data, '');
+    },
+    setFormWithData: function(form, data, path){
+      if (Array.isArray(data)) {
+        this.setFromWithArray(form, data, path);
+      } else {
+        this.setFormWithObject(form, data, path);
+      }
+    },
+    setFromWithArray: function(form, data, path){
+      var container, amountOfArrayItemsNeedAdded, button, i$, ref$, len$, i, index, value, newPath;
+      container = $(form).find("[name=\"" + path + "\"]");
+      if (!container.hasClass('array-container')) {
+        throw new Error(path + " is an array but can't find its array-container");
+      }
+      amountOfArrayItemsNeedAdded = data.length - parseInt(container.attr('data-a-plus-length'));
+      button = $(container).children('button.at-plus.add-array-item');
+      for (i$ = 0, len$ = (ref$ = (fn$())).length; i$ < len$; ++i$) {
+        i = ref$[i$];
+        this.clickingButtonToAddArrayItem(button);
+      }
+      for (i$ = 0, len$ = data.length; i$ < len$; ++i$) {
+        index = i$;
+        value = data[i$];
+        newPath = path + "[" + index + "]";
+        if ($(form).find("[name=\"" + newPath + "\"]").length === 0) {
+          throw new Error("can't find " + newPath);
+        }
+        this.setFormWithData(form, value, newPath);
+      }
+      function fn$(){
+        var i$, to$, results$ = [];
+        for (i$ = 1, to$ = amountOfArrayItemsNeedAdded; i$ <= to$; ++i$) {
+          results$.push(i$);
+        }
+        return results$;
+      }
+    },
+    setFormWithObject: function(form, data, path){
+      var key, value, newPath;
+      if (typeof data !== 'object') {
+        $(form).find("[name=\"" + path + "\"]").val(data);
+      } else {
+        for (key in data) {
+          value = data[key];
+          newPath = path === ''
+            ? key
+            : path + "." + key;
+          if ($(form).find("[name=\"" + newPath + "\"]").length === 0) {
+            throw new Error("can't find " + newPath);
+          }
+          this.setFormWithData(form, value, newPath);
+        }
       }
     }
   };

@@ -11,21 +11,18 @@
 <body>
   <h1>form-data-binder-driven-case</h1>
   <form>
-    <label>题目
-      <input type="text" name="title"/>
-    </label>
-    <label>要求
-      <input type="text" name="content"/>
-    </label>
-    <label>时间
-      <input type="text" name="endTime"/>
-    </label>
+    <label>题目</label>
+    <input type="text" name="title"/>
+    <label>要求</label>
+    <input type="text" name="content"/>
+    <label>时间</label>
+    <input type="text" name="endTime"/>
     <div name="assignedBy" class="a-plus object">
       <label>出题教师</label>
       <input type="hidden" name="assignedBy.userId"/>
       <input type="text" name="assignedBy.name"/>
     </div>
-    <div name="forStudents" data-a-plus-restrict="[1, 2]" data-a-plus-length="1" class="a-plus array-container">
+    <div name="forStudents" data-a-plus-restrict="[1, 2]" data-a-plus-length="1" class="a-plus array-container"> 
       <label>参与学生</label>
       <input type="text" name="forStudents[0]" class="a-plus array-item"/>
     </div>
@@ -33,16 +30,14 @@
       <label>交付件列表</label>
       <fieldset name="submissions[0]" class="a-plus array-item object"> 
         <legend>交付件</legend>
-        <label>名称
-          <input type="text" name="submissions[0].name"/>
-        </label>
+        <label>名称</label>
+        <input type="text" name="submissions[0].name"/>
         <div name="submissions[0].type" data-a-plus-restrict="[1, *]" data-a-plus-length="1" class="a-plus array-container">
           <label>文件格式 </label>
           <input type="text" name="submissions[0].type[0]" class="a-plus array-item"/>
         </div>
-        <label>要求  
-          <input type="text" name="submissions[0].description"/>
-        </label>
+        <label>要求  </label>
+        <input type="text" name="submissions[0].description"/>
       </fieldset>
     </div>
   </form>

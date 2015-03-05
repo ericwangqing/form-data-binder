@@ -7,10 +7,10 @@ form-data-binder =
     @build-data name-value-pairs, data
 
   build-data: (pairs, data)->
-    [@set-value pair.name, pair.value, data for pair in pairs]
+    [@set-data-value pair.name, pair.value, data for pair in pairs]
     data
 
-  set-value: (path, value, data)->
+  set-data-value: (path, value, data)->
     path = path.trim!
     throw new Error "path: '#{path}'' is invalid" if not path-validation-regex.test path
     levels = path.split path-delimiter
@@ -50,6 +50,36 @@ form-data-binder =
 
     [array[i] = null if typeof array[i] is 'undefined' for i in [0 to index - 1]]
     array[index] ||= value 
+
+  d2f: (data, selector)!->
+    form = $ selector
+    @set-form-with-data form, data, ''
+
+  set-form-with-data: (form, data, path)!->
+    if Array.is-array data then @set-from-with-array form, data, path else @set-form-with-object form, data, path
+
+  set-from-with-array: (form, data, path)!->
+    container = $ form .find "[name=\"#{path}\"]" 
+    throw new Error "#{path} is an array but can't find its array-container" if not container.has-class 'array-container'
+    amount-of-array-items-need-added = data.length - parse-int container.attr 'data-a-plus-length'
+    button = $ container .children 'button.at-plus.add-array-item'
+    [@clicking-button-to-add-array-item button for i in [1 to amount-of-array-items-need-added]]
+    for value, index in data
+      new-path = "#{path}[#{index}]"
+      throw new Error "can't find #{new-path}" if $ form .find "[name=\"#{new-path}\"]" .length is 0
+      @set-form-with-data form, value, new-path
+
+
+  set-form-with-object: (form, data, path)!->
+    if typeof data isnt 'object'
+      $ form .find "[name=\"#{path}\"]" .val data 
+
+    else for key, value of data
+      new-path = if path is '' then key else "#{path}.#{key}" 
+      throw new Error "can't find #{new-path}" if $ form .find "[name=\"#{new-path}\"]" .length is 0
+      @set-form-with-data form, value, new-path
+
+
 
 
 if define? # AMD

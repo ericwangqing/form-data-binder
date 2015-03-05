@@ -1,19 +1,24 @@
 (function(){
-  var insertAddingItemButton, updateIndexAndLength, updateItemIndex, updateName, slice$ = [].slice;
+  var insertAddingItemButton, clickingButtonToAddArrayItem, updateIndexAndLength, updateItemIndex, updateName, slice$ = [].slice;
   insertAddingItemButton = function(container){
     var button;
-    button = $('<button> + </button> ');
-    (function(container){
-      button.click(function(event){
-        var item, newItem;
-        item = $(container).find('.array-item').get(0);
-        newItem = $(item).clone();
-        updateIndexAndLength(container, newItem);
-        $(container).append(newItem);
-        return false;
-      });
-      $(container).prepend(button);
-    }.call(this, container));
+    button = $('<button class="at-plus add-array-item"> + </button> ');
+    button.click(function(event){
+      return clickingButtonToAddArrayItem(this);
+    });
+    $(container).prepend(button);
+  };
+  window.formDataBinder.clickingButtonToAddArrayItem = clickingButtonToAddArrayItem = function(button){
+    var container, item, newItem;
+    container = $(button).parent('.a-plus.array-container');
+    item = container.find('.array-item').get(0);
+    newItem = $(item).clone();
+    $(newItem).find('button.at-plus.add-array-item').click(function(event){
+      return clickingButtonToAddArrayItem(this, event);
+    });
+    updateIndexAndLength(container, newItem);
+    $(container).append(newItem);
+    return false;
   };
   updateIndexAndLength = function(container, newItem){
     var newItemIndex;
