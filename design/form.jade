@@ -23,13 +23,13 @@ form
     input(type='hidden', name='assignedBy.userId')
     input(type='text', name='assignedBy.name')
 
-  .a-plus.array(name='forStudents' data-a-plus-restrict='[1, 2]')
+  .a-plus.array(name='forStudents' data-a-plus-restriction='[1, 2]')
     input(type='text' name='forStudents[0]')
       
-  .a-plus.array(name='submissions' data-a-plus-restrict='[1, *]')
+  .a-plus.array(name='submissions' data-a-plus-restriction='[1, *]')
     .a-plus.object(name='submissions[0]')
       input(type='text', name='submissions[0].name')
-      .a-plus.array(name='submissions[0].type' data-a-plus-restrict='[1, *]')
+      .a-plus.array(name='submissions[0].type' data-a-plus-restriction='[1, *]')
         input(type='text' name='submissions[0].type[0]')
       input(type='text' name='submissions[0].description')
 

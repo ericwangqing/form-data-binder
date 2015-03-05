@@ -9,8 +9,8 @@ head
 
 
 body
-  h1 form-data-binder-driven-case
-  form
+  h1 form-data-binder-driven-case: parsed form
+  form#parsed
     label 题目
     input(type='text' name='title')
     label 要求
@@ -23,23 +23,26 @@ body
       input(type='hidden', name='assignedBy.userId')
       input(type='text', name='assignedBy.name')
 
-    .a-plus.array-container(name='forStudents' data-a-plus-restrict='[1, 2]' data-a-plus-length='1') 
+    .a-plus.array-container(name='forStudents' data-a-plus-restriction='[1, 2]' data-a-plus-length='1') 
       label 参与学生
-      input.a-plus.array-item(type='text' name='forStudents[0]')
+      .a-plus.array-item
+        input(type='text' name='forStudents[0]')
         
-    .a-plus.array-container(name='submissions' data-a-plus-restrict='[1, 2]' data-a-plus-length='1')
+    .a-plus.array-container(name='submissions' data-a-plus-restriction='[1, 2]' data-a-plus-length='1')
       label 交付件列表
-      fieldset.a-plus.array-item.object(name='submissions[0]') 
-        legend 交付件
-        label 名称
-        input(type='text', name='submissions[0].name')
-        .a-plus.array-container(name='submissions[0].type' data-a-plus-restrict='[1, *]' data-a-plus-length='1')
-          label 文件格式 
-          input.a-plus.array-item(type='text' name='submissions[0].type[0]')
-        label 要求  
-        input(type='text' name='submissions[0].description')
+      .a-plus.array-item.object(name='submissions[0]')
+        fieldset 
+          legend 交付件
+          label 名称
+          input(type='text', name='submissions[0].name')
+          .a-plus.array-container(name='submissions[0].type' data-a-plus-restriction='[1, *]' data-a-plus-length='1')
+            label 文件格式 
+            .a-plus.array-item
+              input(type='text' name='submissions[0].type[0]')
+          label 要求  
+          input(type='text' name='submissions[0].description')
 
-//-
-  1）必须加入.a-plus.array-container标记 array，用data-a-plus-length记录array的length
-  2）必须用.a-plus.array-item注明array的item
-
+  //- formatted form
+    1）必须加入.a-plus.array-container标记 array，用data-a-plus-length记录array的length
+    2）必须用.a-plus.array-item注明array的item
+    3) 必须用.a-plus.object标注出对象
