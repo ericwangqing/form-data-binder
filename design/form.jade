@@ -1,0 +1,38 @@
+//- 加载时的模板，简写形式
+form
+  input(type='text' name='title')
+  input(type='text' name='content')
+  input(type='text' name='endTime')
+
+  input(type='hidden', name='assignedBy.userId')
+  input(type='text', name='assignedBy.name')
+
+  input(type='text' name='forStudents[1, 2]' )
+
+  input(type='text' name='submissions[1, *].name')
+  input(type='text' name='submissions[1, *].type[1, *]')
+  input(type='text' name='submissions[1, *].description')
+
+//- 初始化之后的模板（DOM中）
+form
+  input(type='text' name='title')
+  input(type='text' name='content')
+  input(type='text' name='endTime')
+
+  .a-plus.object(name='assignedBy')
+    input(type='hidden', name='assignedBy.userId')
+    input(type='text', name='assignedBy.name')
+
+  .a-plus.array(name='forStudents' data-a-plus-restrict='[1, 2]')
+    input(type='text' name='forStudents[0]')
+      
+  .a-plus.array(name='submissions' data-a-plus-restrict='[1, *]')
+    .a-plus.object(name='submissions[0]')
+      input(type='text', name='submissions[0].name')
+      .a-plus.array(name='submissions[0].type' data-a-plus-restrict='[1, *]')
+        input(type='text' name='submissions[0].type[0]')
+      input(type='text' name='submissions[0].description')
+
+
+
+

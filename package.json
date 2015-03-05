@@ -13,18 +13,19 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "grunt": "~0.4.1",
+    "grunt": "^0.4.5",
     "grunt-bump": "0.0.6",
     "grunt-contrib-clean": "^0.4.1",
     "grunt-contrib-concat": "^0.5.0",
     "grunt-contrib-copy": "^0.4.1",
+    "grunt-contrib-jade": "^0.14.1",
     "grunt-contrib-requirejs": "^0.4.4",
     "grunt-contrib-watch": "^0.4.4",
     "grunt-conventional-changelog": "^0.1.2",
     "grunt-livescript": "0.5.1",
     "grunt-newer": "^0.7.0",
     "load-grunt-configs": "^0.4.0",
-    "rjs-build-analysis": "0.0.3",
-    "load-grunt-tasks": "^0.6.0"
+    "load-grunt-tasks": "^0.6.0",
+    "rjs-build-analysis": "0.0.3"
   }
 }

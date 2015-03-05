@@ -1,13 +1,13 @@
 {
-  "name": "a-plus",
-  "main": "ui.js",
+  "name": "form-data-binder",
+  "main": "form-data-binder.js",
   "location": "bin",
   "version": "0.0.1",
   "devDependencies": {},
   "moduleType": ["node"],
-  "keywords": ["@+", "a+", "A+"],
-  "license": "ATPLUS",
-  "private": true,
+  "keywords": ["form", "data", "bind"],
+  "license": "MIT",
+  "private": false,
   "ignore": [
     "node_modules",
     "bower_components",

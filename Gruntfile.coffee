@@ -33,6 +33,7 @@ module.exports = (grunt) ->
         files:
           src: [
             "bin/*"
+            "!bin/vendor" # retain bower components
             "!bin/vendor/**/*" # retain bower components
             ".temp"
           ]
@@ -40,7 +41,7 @@ module.exports = (grunt) ->
     copy:
       other:
         files: [
-          src: ["*.js", "README.md"]
+          src: ["**/*.js", '**/*.css', "README.md"]
           dest: "bin/"
           cwd: "src/"
           expand: true
@@ -77,19 +78,40 @@ module.exports = (grunt) ->
               return done(new Error("r.js built duplicate modules, please check the excludes option."))
             done()          
 
+    jade:
+      options:
+        pretty: true
+        # data: 
+        #   pkg: pkg
+        #   host: host
+        #   debug: DEBUG
+      all:
+        expand: true
+        cwd: "src"
+        src: ["**/*.jade"]
+        dest: "bin"
+        ext: ".html"
+
+
 
     delta:
       options:
-        livereload: false
+        livereload: true
 
       livescript:
         files: ["src/**/*.ls"]
         tasks: ["newer:livescript"]
         # tasks: ["newer:livescript", "requirejs"]
+      jade:
+        files: ["src/**/*.jade"]
+        tasks: ["newer:jade"]
 
       other:
-        files: ["src/*.js", "src/README.md"]
+        files: ["src/**/*.js", "src/**/*.css", "src/README.md"]
         tasks: ["newer:copy"]
+
+      grunt:
+        files: ['Gruntfile.coffee']
 
  
   grunt.renameTask "watch", "delta"
@@ -107,6 +129,7 @@ module.exports = (grunt) ->
     "clean"
     "copy"
     "livescript"
+    "jade"
     # "requirejs"
   ]
   
