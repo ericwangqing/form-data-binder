@@ -1,0 +1,23 @@
+{
+  "name": "a-plus",
+  "main": "ui.js",
+  "location": "bin",
+  "version": "0.0.1",
+  "devDependencies": {},
+  "moduleType": ["node"],
+  "keywords": ["@+", "a+", "A+"],
+  "license": "ATPLUS",
+  "private": true,
+  "ignore": [
+    "node_modules",
+    "bower_components",
+    "vendor",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "components/jquery#~2.1.1",
+    "jquery-debounce": "~1.0.5",
+    "requirejs": "~2.1.15"
+  }
+}
