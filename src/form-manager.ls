@@ -4,42 +4,114 @@ class Form
   (selector, @form-data)!-> 
     @form = $ selector
     self = @
-    @form.find '.a-plus.array-container' .each -> {min, max} = self.parse-restriction container = $ @ ; if max > 1
-      self.insert-adding-item-button container
+    containers = @form.find '.a-plus.array-container'
+    @render-containers containers
+
+  render-containers: (containers)!-> for container in containers
+    container = $ container
+    {min, max} = @parse-restriction container
+    @insert-adding-item-button container
+    @insert-removing-item-button container
+    @add-up-to-minium-items container
+    @show-or-hide-adding-removing-buttons container
+
+  add-up-to-minium-items: (container)!-> 
+    {min, max} = @parse-restriction container
+    [@add-array-item container for i in [1 to min]] if min > 1
+
+  show-or-hide-adding-removing-buttons: (container)!->
+    length = parse-int container.attr 'data-a-plus-length'
+    {max, min} = @parse-restriction container
+    removes = container.children '.array-item' .children 'button.a-plus.remove-array-item'
+    adds    = container.children 'button.a-plus.add-array-item'
+    switch
+    | length is min       => removes.hide! ; adds.show!
+    | min < length < max  => removes.show! ; adds.show!
+    | length is max       => removes.show! ; adds.hide!
 
   insert-adding-item-button: (container)!->
+    self = @
     button = $ '<button class="a-plus add-array-item"> + </button> '
-    button.click (event)~> @clicking-button-to-add-array-item container, button
+    button.click (event)-> self.clicking-button-to-add-array-item @
     container .prepend button 
 
-  clicking-button-to-add-array-item: (container, button)-> 
-    $ button .hide! if (length = @add-array-item container) is container.a-plus-restriction.max
-    false
+  insert-removing-item-button: (container)!->
+    items = container.children '.a-plus.array-item'
+    [@add-clicking-to-remove-this-item container, item for item in items]
 
-  add-array-item: (container)-> 
-    @form-data.add-array-item  container, (container, item)~> @add-item-behavior container, item
+  clicking-button-to-add-array-item: (button)-> 
+    container = $ button .closest '.array-container'
+    length = parse-int container.attr 'data-a-plus-length'
+    if length is 0
+      item = container.children '.array-item'
+      @change-fields-name item.show!, 'name' # 从0增加时，仅仅是恢复隐藏的。
+      container.attr 'data-a-plus-length', 1
+    else
+      @add-array-item container 
+    @show-or-hide-adding-removing-buttons container ; false
+
+  add-array-item: (container)!-> 
+    @form-data.add-array-item  container, (container, item)!~> @add-item-behavior container, item
     
-  add-item-behavior: (container, item)->
-    $ item .find 'button.a-plus.add-array-item' .click (event)~> @clicking-button-to-add-array-item container
-    length = @update-index-and-length container, item
+  add-item-behavior: (container, item)!->
+    @add-clicking-to-remove-item-for-this-and-nested-children container, item
+    @add-clicking-to-add-item-for-nested-children container, item
+
+  add-clicking-to-remove-this-item: (container, item)->
+    self = @
+    button = $ '<button class="a-plus remove-array-item"> × </button> '
+    button.click (event)-> self.clicking-button-to-remove-array-item @
+    $ item .prepend button 
+
+  add-clicking-to-remove-item-for-this-and-nested-children: (container, item)->
+    self = @
+    button = $ item .find 'button.a-plus.remove-array-item' 
+    button.click (event)-> self.clicking-button-to-remove-array-item @
+
+  clicking-button-to-remove-array-item: (button)->
+    item = $ button .closest '.array-item'
+    container = $ button .closest '.array-container'
+    length = parse-int container.attr 'data-a-plus-length'
+    if length > 1 
+      item.remove! 
+      @decrease-index-and-length container
+    else 
+      @change-fields-name item.hide!, '_name_' # 当仅剩一个item，不能移除，以便将来添加时，能够有模板clone
+      container.attr 'data-a-plus-length', 0
+    @show-or-hide-adding-removing-buttons container ; false
+
+  change-fields-name: (item, _to)->
+    from = if _to is '_name_' then 'name' else '_name_'
+    item.find "[#{from}]" .each -> $ @ .attr _to, ($ @ .attr from) .remove-attr from
+
+
+  decrease-index-and-length: (container)!->
+    items = container.children '.a-plus.array-item'
+    [@update-item-index item, index for item, index in items]
+    length = (container.attr 'data-a-plus-length') - 1 
+    container.attr 'data-a-plus-length',  length
+
+  add-clicking-to-add-item-for-nested-children: (container, item)->
+    self = @
+    button = $ item .find 'button.a-plus.add-array-item' 
+    button.click (event)-> self.clicking-button-to-add-array-item @
+    length = @increase-index-and-length container, item
 
   parse-restriction:  do ->
     parse-number = (number)-> if number is '*' then Infinity else parse-int number
     (container)!->
-      return container.a-plus-restriction if container.a-plus-restriction
       restriction = container.attr 'data-a-plus-restriction'
       if not restriction
         [min = 0, max = Infinity]
       else
         [__all__, min, max] = restriction.match restriction-regex
         [min = (parse-number min), max = (parse-number max)]
-      return container.a-plus-restriction = {restriction, min, max}
+      return {restriction, min, max}
 
-  update-index-and-length: (container, new-item)->
+  increase-index-and-length: (container, new-item)!->
     new-item-index = parse-int container.attr 'data-a-plus-length'
     @update-item-index new-item, new-item-index
     container.attr 'data-a-plus-length', length = new-item-index + 1 
-    length
 
   update-item-index: (item, index)!-> 
     old-item-name = $ item .attr 'name' or $ item .children '[name]' .attr 'name'

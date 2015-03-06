@@ -5,45 +5,161 @@
     Form.displayName = 'Form';
     var prototype = Form.prototype, constructor = Form;
     function Form(selector, formData){
-      var self;
+      var self, containers;
       this.formData = formData;
       this.form = $(selector);
       self = this;
-      this.form.find('.a-plus.array-container').each(function(){
-        var container, ref$, min, max;
-        ref$ = self.parseRestriction(container = $(this)), min = ref$.min, max = ref$.max;
-        if (max > 1) {
-          return self.insertAddingItemButton(container);
-        }
-      });
+      containers = this.form.find('.a-plus.array-container');
+      this.renderContainers(containers);
     }
+    prototype.renderContainers = function(containers){
+      var i$, len$, container, ref$, min, max;
+      for (i$ = 0, len$ = containers.length; i$ < len$; ++i$) {
+        container = containers[i$];
+        container = $(container);
+        ref$ = this.parseRestriction(container), min = ref$.min, max = ref$.max;
+        this.insertAddingItemButton(container);
+        this.insertRemovingItemButton(container);
+        this.addUpToMiniumItems(container);
+        this.showOrHideAddingRemovingButtons(container);
+      }
+    };
+    prototype.addUpToMiniumItems = function(container){
+      var ref$, min, max, i$, len$, i;
+      ref$ = this.parseRestriction(container), min = ref$.min, max = ref$.max;
+      if (min > 1) {
+        for (i$ = 0, len$ = (ref$ = (fn$())).length; i$ < len$; ++i$) {
+          i = ref$[i$];
+          this.addArrayItem(container);
+        }
+      }
+      function fn$(){
+        var i$, to$, results$ = [];
+        for (i$ = 1, to$ = min; i$ <= to$; ++i$) {
+          results$.push(i$);
+        }
+        return results$;
+      }
+    };
+    prototype.showOrHideAddingRemovingButtons = function(container){
+      var length, ref$, max, min, removes, adds;
+      length = parseInt(container.attr('data-a-plus-length'));
+      ref$ = this.parseRestriction(container), max = ref$.max, min = ref$.min;
+      removes = container.children('.array-item').children('button.a-plus.remove-array-item');
+      adds = container.children('button.a-plus.add-array-item');
+      switch (false) {
+      case length !== min:
+        removes.hide();
+        adds.show();
+        break;
+      case !(min < length && length < max):
+        removes.show();
+        adds.show();
+        break;
+      case length !== max:
+        removes.show();
+        adds.hide();
+      }
+    };
     prototype.insertAddingItemButton = function(container){
-      var button, this$ = this;
+      var self, button;
+      self = this;
       button = $('<button class="a-plus add-array-item"> + </button> ');
       button.click(function(event){
-        return this$.clickingButtonToAddArrayItem(container, button);
+        return self.clickingButtonToAddArrayItem(this);
       });
       container.prepend(button);
     };
-    prototype.clickingButtonToAddArrayItem = function(container, button){
-      var length;
-      if ((length = this.addArrayItem(container)) === container.aPlusRestriction.max) {
-        $(button).hide();
+    prototype.insertRemovingItemButton = function(container){
+      var items, i$, len$, item;
+      items = container.children('.a-plus.array-item');
+      for (i$ = 0, len$ = items.length; i$ < len$; ++i$) {
+        item = items[i$];
+        this.addClickingToRemoveThisItem(container, item);
       }
+    };
+    prototype.clickingButtonToAddArrayItem = function(button){
+      var container, length, item;
+      container = $(button).closest('.array-container');
+      length = parseInt(container.attr('data-a-plus-length'));
+      if (length === 0) {
+        item = container.children('.array-item');
+        this.changeFieldsName(item.show(), 'name');
+        container.attr('data-a-plus-length', 1);
+      } else {
+        this.addArrayItem(container);
+      }
+      this.showOrHideAddingRemovingButtons(container);
       return false;
     };
     prototype.addArrayItem = function(container){
       var this$ = this;
-      return this.formData.addArrayItem(container, function(container, item){
-        return this$.addItemBehavior(container, item);
+      this.formData.addArrayItem(container, function(container, item){
+        this$.addItemBehavior(container, item);
       });
     };
     prototype.addItemBehavior = function(container, item){
-      var length, this$ = this;
-      $(item).find('button.a-plus.add-array-item').click(function(event){
-        return this$.clickingButtonToAddArrayItem(container);
+      this.addClickingToRemoveItemForThisAndNestedChildren(container, item);
+      this.addClickingToAddItemForNestedChildren(container, item);
+    };
+    prototype.addClickingToRemoveThisItem = function(container, item){
+      var self, button;
+      self = this;
+      button = $('<button class="a-plus remove-array-item"> × </button> ');
+      button.click(function(event){
+        return self.clickingButtonToRemoveArrayItem(this);
       });
-      return length = this.updateIndexAndLength(container, item);
+      return $(item).prepend(button);
+    };
+    prototype.addClickingToRemoveItemForThisAndNestedChildren = function(container, item){
+      var self, button;
+      self = this;
+      button = $(item).find('button.a-plus.remove-array-item');
+      return button.click(function(event){
+        return self.clickingButtonToRemoveArrayItem(this);
+      });
+    };
+    prototype.clickingButtonToRemoveArrayItem = function(button){
+      var item, container, length;
+      item = $(button).closest('.array-item');
+      container = $(button).closest('.array-container');
+      length = parseInt(container.attr('data-a-plus-length'));
+      if (length > 1) {
+        item.remove();
+        this.decreaseIndexAndLength(container);
+      } else {
+        this.changeFieldsName(item.hide(), '_name_');
+        container.attr('data-a-plus-length', 0);
+      }
+      this.showOrHideAddingRemovingButtons(container);
+      return false;
+    };
+    prototype.changeFieldsName = function(item, _to){
+      var from;
+      from = _to === '_name_' ? 'name' : '_name_';
+      return item.find("[" + from + "]").each(function(){
+        return $(this).attr(_to, $(this).attr(from)).removeAttr(from);
+      });
+    };
+    prototype.decreaseIndexAndLength = function(container){
+      var items, i$, len$, index, item, length;
+      items = container.children('.a-plus.array-item');
+      for (i$ = 0, len$ = items.length; i$ < len$; ++i$) {
+        index = i$;
+        item = items[i$];
+        this.updateItemIndex(item, index);
+      }
+      length = container.attr('data-a-plus-length') - 1;
+      container.attr('data-a-plus-length', length);
+    };
+    prototype.addClickingToAddItemForNestedChildren = function(container, item){
+      var self, button, length;
+      self = this;
+      button = $(item).find('button.a-plus.add-array-item');
+      button.click(function(event){
+        return self.clickingButtonToAddArrayItem(this);
+      });
+      return length = this.increaseIndexAndLength(container, item);
     };
     prototype.parseRestriction = function(){
       var parseNumber;
@@ -56,9 +172,6 @@
       };
       return function(container){
         var restriction, min, max, ref$, __all__;
-        if (container.aPlusRestriction) {
-          return container.aPlusRestriction;
-        }
         restriction = container.attr('data-a-plus-restriction');
         if (!restriction) {
           [min = 0, max = Infinity];
@@ -66,19 +179,18 @@
           ref$ = restriction.match(restrictionRegex), __all__ = ref$[0], min = ref$[1], max = ref$[2];
           [min = parseNumber(min), max = parseNumber(max)];
         }
-        return container.aPlusRestriction = {
+        return {
           restriction: restriction,
           min: min,
           max: max
         };
       };
     }();
-    prototype.updateIndexAndLength = function(container, newItem){
+    prototype.increaseIndexAndLength = function(container, newItem){
       var newItemIndex, length;
       newItemIndex = parseInt(container.attr('data-a-plus-length'));
       this.updateItemIndex(newItem, newItemIndex);
       container.attr('data-a-plus-length', length = newItemIndex + 1);
-      return length;
     };
     prototype.updateItemIndex = function(item, index){
       var oldItemName, newItemName, fields, i$, len$, field;
