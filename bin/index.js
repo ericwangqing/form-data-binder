@@ -1,5 +1,5 @@
 (function(){
   $(function(){
-    return window.testForm = formManager.create('form#parsed');
+    return window.assignmentForm = formManager.create('form#assignment');
   });
 }).call(this);

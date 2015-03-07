@@ -10,8 +10,8 @@ head
 
 
 body
-  h1 form-data-binder-driven-case: parsed form
-  form#parsed
+  h1 form-data-binder-driven-case: assginment form
+  form#assignment
     label 题目
     input(type='text' name='title')
     label 要求
@@ -40,10 +40,14 @@ body
             label 文件格式 
             .a-plus.array-item
               input(type='text' name='submissions[0].type[0]')
-          label 要求  
-          input(type='text' name='submissions[0].description')
+          label 副本数量  
+          input(type='text' name='submissions[0].copiesAmount')
+
+    //- label 作业提交表单
+    //- textarea(name='assignmentFormDesign')
 
   //- formatted form
     1）必须加入.a-plus.array-container标记 array，用data-a-plus-length记录array的length
     2）必须用.a-plus.array-item注明array的item
     3) 必须用.a-plus.object标注出对象
+
