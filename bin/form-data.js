@@ -1,7 +1,7 @@
 (function(){
   var pathDelimiter, pathValidationRegex, formData, root, ref$;
   pathDelimiter = '.';
-  pathValidationRegex = /^[a-zA-Z0-9.[\]]+$/;
+  pathValidationRegex = /^[_a-zA-Z0-9.[\]]+$/;
   formData = function(){
     return {
       f2d: function(form, data){

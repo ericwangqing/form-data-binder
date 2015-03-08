@@ -2,6 +2,7 @@
 <head>
   <title>form-data-binder-driven-case</title>
   <meta charset="utf-8"/>
+  <link rel="stylesheet" href="gridforms.css"/>
   <link rel="stylesheet" href="index.css"/>
   <script src="vendor/jquery/jquery.js"> </script>
   <script src="form-data.js"> </script>
@@ -11,41 +12,73 @@
 </head>
 <body>
   <h1>form-data-binder-driven-case: assginment form</h1>
-  <form id="assignment">
-    <label>题目</label>
-    <input type="text" name="title"/>
-    <label>要求</label>
-    <input type="text" name="content"/>
-    <label>时间</label>
-    <input type="text" name="endTime"/>
-    <div name="assignedBy" class="a-plus object">
-      <label>出题教师</label>
-      <input type="hidden" name="assignedBy.userId"/>
-      <input type="text" name="assignedBy.name"/>
-    </div>
-    <div name="forStudents" data-a-plus-restriction="[0, *]" data-a-plus-length="1" class="a-plus array-container"> 
-      <label>参与学生</label>
-      <div class="a-plus array-item">
-        <input type="text" name="forStudents[0]"/>
+  <form id="assignment" class="grid-form">
+    <fieldset class="create_assignment"> 
+      <legend>布置作业</legend>
+      <div data-row-span="4">
+        <div data-field-span="3"> 
+          <label>题目</label>
+          <input type="text" name="title"/>
+        </div>
+        <div data-field-span="1"> 
+          <label>出题老师</label>
+          <div name="assignedBy" class="a-plus object">
+            <input type="hidden" name="assignedBy._id"/>
+            <input type="text" name="assignedBy.name"/>
+          </div>
+        </div>
       </div>
-    </div>
-    <div name="submissions" data-a-plus-restriction="[0, 2]" data-a-plus-length="1" class="a-plus array-container">
-      <label>交付件列表</label>
-      <div name="submissions[0]" class="a-plus array-item object">
-        <fieldset> 
-          <legend>交付件</legend>
-          <label>名称</label>
-          <input type="text" name="submissions[0].name"/>
-          <div name="submissions[0].type" data-a-plus-restriction="[1, *]" data-a-plus-length="1" class="a-plus array-container">
-            <label>文件格式 </label>
+      <div data-row-span="3">
+        <div data-field-span="1"> 
+          <div name="forStudents" data-a-plus-restriction="[0, *]" data-a-plus-length="1" class="a-plus array-container"> 
+            <label>参与学生列表</label>
             <div class="a-plus array-item">
-              <input type="text" name="submissions[0].type[0]"/>
+              <input type="text" name="forStudents[0]" class="typeahead"/>
             </div>
           </div>
-          <label>副本数量  </label>
-          <input type="text" name="submissions[0].copiesAmount"/>
-        </fieldset>
+        </div>
+        <div name="restrictions" class="a-plus object">
+          <div data-field-span="1"> 
+            <label>截止时间</label>
+            <input type="datetime-local" name="restrictions.endTime"/>
+          </div>
+          <div data-field-span="1"> 
+            <label>最多提交次数</label>
+            <input type="datetime-local" name="restrictions.submitTimes"/>
+          </div>
+        </div>
       </div>
-    </div>
+      <div data-row-span="1" data-row-height="3">
+        <div data-field-span="1"> 
+          <label>具体要求</label>
+          <textarea name="requirement"></textarea>
+        </div>
+      </div>
+      <div name="submissions" data-a-plus-restriction="[0, 2]" data-a-plus-length="1" class="a-plus array-container">
+        <label>交付件列表</label>
+        <div class="a-plus array-item">
+          <div name="submissions[0]" class="a-plus object">
+            <div data-row-span="3">
+              <div data-field-span="1"> 
+                <label>名称</label>
+                <input type="text" name="submissions[0].name"/>
+              </div>
+              <div data-field-span="1"> 
+                <div name="submissions[0].type" data-a-plus-restriction="[1, *]" data-a-plus-length="1" class="a-plus array-container">
+                  <label>类型</label>
+                  <div class="a-plus array-item">
+                    <input type="text" name="submissions[0].type[0]"/>
+                  </div>
+                </div>
+              </div>
+              <div data-field-span="1"> 
+                <label>副本数量  </label>
+                <input type="text" name="submissions[0].copiesAmount"/>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </fieldset>
   </form>
 </body>

@@ -1,5 +1,5 @@
 path-delimiter = '.'
-path-validation-regex = /^[a-zA-Z0-9.[\]]+$/
+path-validation-regex = /^[_a-zA-Z0-9.[\]]+$/
 
 form-data = ->
 
