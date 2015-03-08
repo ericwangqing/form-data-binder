@@ -1,7 +1,8 @@
 (function(){
-  var pathDelimiter, pathValidationRegex, formData, root, ref$;
+  var pathDelimiter, pathValidationRegex, arrayKeyRegex, formData, root, ref$;
   pathDelimiter = '.';
   pathValidationRegex = /^[a-zA-Z0-9.[\]]+$/;
+  arrayKeyRegex = /(.+)\[(\d+)\]$/;
   formData = function(){
     return {
       f2d: function(form, data){
@@ -12,68 +13,60 @@
         return this.buildData(nameValuePairs, data);
       },
       buildData: function(pairs, data){
-        var i$, len$, pair;
+        var i$, len$, ref$, name, value;
         for (i$ = 0, len$ = pairs.length; i$ < len$; ++i$) {
-          pair = pairs[i$];
-          this.setDataValue(pair.name, pair.value, data);
+          ref$ = pairs[i$], name = ref$.name, value = ref$.value;
+          this.setDataValue(name, value, data);
         }
         return data;
       },
       setDataValue: function(path, value, data){
-        var levels, obj, i$, len$, i, level, matches, __all__, attr, index, results$ = [];
+        var keys, lastKey, i$, len$, key;
         path = path.trim();
         if (!pathValidationRegex.test(path)) {
           throw new Error("path: '" + path + "'' is invalid");
         }
-        levels = path.split(pathDelimiter);
-        obj = data;
-        for (i$ = 0, len$ = levels.length; i$ < len$; ++i$) {
-          i = i$;
-          level = levels[i$];
-          matches = level.match(/(.+)\[(\d+)\]$/);
-          if (!matches) {
-            results$.push(obj = this.setObjectValue(obj, level, value, this.getNextLevel(levels, i)));
-          } else {
-            __all__ = matches[0], attr = matches[1], index = matches[2];
-            results$.push(obj = this.setArrayValue(obj, attr, index, value, this.getNextLevel(levels, i)));
-          }
+        keys = path.split(pathDelimiter);
+        lastKey = keys.pop();
+        for (i$ = 0, len$ = keys.length; i$ < len$; ++i$) {
+          key = keys[i$];
+          data = this.setDataKey(data, key);
         }
-        return results$;
+        return this.setFinalValue(data, lastKey, value);
       },
-      getNextLevel: function(levels, i){
-        if (i === levels.length - 1) {
-          return null;
+      setDataKey: function(data, key){
+        var matches, ref$, __all__, index;
+        matches = key.match(arrayKeyRegex);
+        if (!matches) {
+          return (ref$ = data[key]) != null
+            ? ref$
+            : data[key] = {};
         } else {
-          return {};
+          __all__ = matches[0], key = matches[1], index = matches[2];
+          return this.setArrayValue(data, key, index, {});
         }
       },
-      setObjectValue: function(obj, attr, value, nextLevel){
-        if (nextLevel) {
-          return obj[attr] || (obj[attr] = nextLevel);
-        } else {
-          if (obj[attr] != null) {
+      setFinalValue: function(data, key, value){
+        var matches, __all__, index;
+        matches = key.match(arrayKeyRegex);
+        if (!matches) {
+          if (data[key] != null) {
             throw new Error("value can't be set as " + value + " since it has already been set as: " + obj[attr]);
           }
-          return obj[attr] = value;
-        }
-      },
-      setArrayValue: function(obj, attr, index, value, nextLevel){
-        var ref$;
-        if (nextLevel) {
-          return this.setArrayValueToIndex(obj, attr, index, nextLevel);
+          return data[key] = value;
         } else {
-          if (((ref$ = obj[attr]) != null ? ref$[index] : void 8) != null) {
-            throw new Error("value can't be set as " + value + " since it has already been set as: " + obj[attr][index]);
-          }
-          return this.setArrayValueToIndex(obj, attr, index, value);
+          __all__ = matches[0], key = matches[1], index = matches[2];
+          return this.setArrayValue(data, key, index, value);
         }
       },
-      setArrayValueToIndex: function(obj, attr, index, value){
-        var array, i$, ref$, len$, i;
-        if (obj[attr] != null && !Array.isArray(obj[attr])) {
-          throw new Error(attr + " of object: " + obj + " should be an array");
+      setArrayValue: function(data, key, index, value){
+        var array, ref$, i$, len$, i;
+        if (data[key] != null && !Array.isArray(data[key])) {
+          throw new Error(key + " of object: " + data + " should be an array");
         }
-        array = obj[attr] || (obj[attr] = []);
+        array = (ref$ = data[key]) != null
+          ? ref$
+          : data[key] = [];
         for (i$ = 0, len$ = (ref$ = (fn$())).length; i$ < len$; ++i$) {
           i = ref$[i$];
           if (typeof array[i] === 'undefined') {
@@ -104,16 +97,16 @@
         }
       },
       setFormWithArray: function(data, path){
-        var container, amountOfArrayItemsNeedAdded, button, i$, ref$, len$, i, index, value, newPath;
-        container = this.form.find("[name=\"" + path + "\"]");
+        var container, amountOfArrayItemsNeedAdded, i$, ref$, len$, i, index, value, newPath;
+        container = this.form.find('[name="#{path}"]');
         if (!container.hasClass('array-container')) {
           throw new Error(path + " is an array but can't find its array-container");
         }
-        amountOfArrayItemsNeedAdded = data.length - parseInt(container.attr('data-a-plus-length'));
-        button = $(container).children('button.a-plus.add-array-item');
+        container = new FormArrayContainer(container);
+        amountOfArrayItemsNeedAdded = data.length - container.getLength();
         for (i$ = 0, len$ = (ref$ = (fn$())).length; i$ < len$; ++i$) {
           i = ref$[i$];
-          this.addArrayItem(container);
+          container.addArrayItem();
         }
         for (i$ = 0, len$ = data.length; i$ < len$; ++i$) {
           index = i$;
@@ -132,18 +125,6 @@
           return results$;
         }
       },
-      addArrayItem: function(container, itemBehaviorAdder){
-        var item, newItem;
-        item = container.find('.array-item').get(0);
-        newItem = $(item).clone();
-        $(container).append(newItem);
-        if (itemBehaviorAdder) {
-          this.itemBehaviorAdder = itemBehaviorAdder;
-        }
-        if (this.itemBehaviorAdder) {
-          return this.itemBehaviorAdder(container, newItem);
-        }
-      },
       setFormWithObject: function(data, path){
         var key, value, newPath;
         if (typeof data !== 'object') {
@@ -154,7 +135,7 @@
             newPath = path === ''
               ? key
               : path + "." + key;
-            if (this.form.find("[name=\"" + newPath + "\"]").length === 0) {
+            if (this.form.find('[name="#{new-path}"]').length === 0) {
               throw new Error("can't find " + newPath);
             }
             this.setFormWithData(value, newPath);

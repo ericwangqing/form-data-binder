@@ -3,10 +3,11 @@
   <title>form-data-binder-driven-case</title>
   <meta charset="utf-8"/>
   <link rel="stylesheet" href="index.css"/>
-  <script src="vendor/jquery/jquery.js"> </script>
-  <script src="form-data.js"> </script>
-  <script src="form-manager.js"> </script>
-  <script src="index.js"> </script>
+  <script src="vendor/jquery/jquery.js"></script>
+  <script src="form-array-container.js"></script>
+  <script src="form-data.js"></script>
+  <script src="form-manager.js"></script>
+  <script src="index.js"></script>
   
 </head>
 <body>
@@ -23,7 +24,7 @@
       <input type="hidden" name="assignedBy.userId"/>
       <input type="text" name="assignedBy.name"/>
     </div>
-    <div name="forStudents" data-a-plus-restriction="[0, *]" data-a-plus-length="1" class="a-plus array-container"> 
+    <div name="forStudents" data-a-plus-restriction="[0, *]" data-a-plus-length="1" class="a-plus array-container">
       <label>参与学生</label>
       <div class="a-plus array-item">
         <input type="text" name="forStudents[0]"/>
@@ -32,17 +33,17 @@
     <div name="submissions" data-a-plus-restriction="[0, 2]" data-a-plus-length="1" class="a-plus array-container">
       <label>交付件列表</label>
       <div name="submissions[0]" class="a-plus array-item object">
-        <fieldset> 
+        <fieldset>
           <legend>交付件</legend>
           <label>名称</label>
           <input type="text" name="submissions[0].name"/>
           <div name="submissions[0].type" data-a-plus-restriction="[1, *]" data-a-plus-length="1" class="a-plus array-container">
-            <label>文件格式 </label>
+            <label>文件格式</label>
             <div class="a-plus array-item">
               <input type="text" name="submissions[0].type[0]"/>
             </div>
           </div>
-          <label>要求  </label>
+          <label>要求</label>
           <input type="text" name="submissions[0].description"/>
         </fieldset>
       </div>
