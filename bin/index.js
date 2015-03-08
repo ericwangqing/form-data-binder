@@ -1,9 +1,9 @@
 (function(){
   $(function(){
-    var formManager, localRecoverier;
+    var formManager, localRecoverierManager;
     formManager = require('form-manager');
-    localRecoverier = require('local-recoverier');
+    localRecoverierManager = require('local-recoverier-manager');
     window.testForm = formManager.create('form#parsed');
-    return localRecoverier.activate('form#parsed');
+    return window.testRecover = localRecoverierManager.create('form#parsed');
   });
 }).call(this);
