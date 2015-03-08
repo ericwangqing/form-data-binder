@@ -43,6 +43,7 @@
     };
     prototype.showOrHideAddingRemovingButtons = function(container){
       var length, ref$, max, min, removes, adds;
+      container = $(container);
       length = parseInt(container.attr('data-a-plus-length'));
       ref$ = this.parseRestriction(container), max = ref$.max, min = ref$.min;
       removes = container.children('.array-item').children('button.a-plus.remove-array-item');
@@ -101,6 +102,7 @@
     prototype.addItemBehavior = function(container, item){
       this.addClickingToRemoveItemForThisAndNestedChildren(container, item);
       this.addClickingToAddItemForNestedChildren(container, item);
+      this.cleanArrayItemInContainer(item);
     };
     prototype.addClickingToRemoveThisItem = function(container, item){
       var self, button;
@@ -140,6 +142,29 @@
       return item.find("[" + from + "]").each(function(){
         return $(this).attr(_to, $(this).attr(from)).removeAttr(from);
       });
+    };
+    prototype.cleanArrayItemInContainer = function(item){
+      var i$, ref$, len$, container, arrayItem, j$, ref1$, len1$, i;
+      for (i$ = 0, len$ = (ref$ = item.find('.array-container')).length; i$ < len$; ++i$) {
+        container = ref$[i$];
+        arrayItem = $(container).children('.array-item');
+        if (arrayItem.length > 1) {
+          for (j$ = 0, len1$ = (ref1$ = (fn$())).length; j$ < len1$; ++j$) {
+            i = ref1$[j$];
+            arrayItem[i].remove();
+          }
+        }
+        $(container).attr('data-a-plus-length', 1);
+        this.showOrHideAddingRemovingButtons(container);
+      }
+      return item.find('input').val('');
+      function fn$(){
+        var i$, to$, results$ = [];
+        for (i$ = 1, to$ = arrayItem.length - 1; i$ <= to$; ++i$) {
+          results$.push(i$);
+        }
+        return results$;
+      }
     };
     prototype.decreaseIndexAndLength = function(container){
       var items, i$, len$, index, item, length;

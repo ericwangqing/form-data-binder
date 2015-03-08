@@ -1,7 +1,7 @@
 restriction-regex = /\[(\d+).+([\d*]+)]/
 
 class Form
-  (selector, @form-data)!-> 
+  (selector, @form-data)!->
     @form = $ selector
     self = @
     containers = @form.find '.a-plus.array-container'
@@ -15,11 +15,12 @@ class Form
     @add-up-to-minium-items container
     @show-or-hide-adding-removing-buttons container
 
-  add-up-to-minium-items: (container)!-> 
+  add-up-to-minium-items: (container)!->
     {min, max} = @parse-restriction container
     [@add-array-item container for i in [1 to min]] if min > 1
 
   show-or-hide-adding-removing-buttons: (container)!->
+    container = $ container
     length = parse-int container.attr 'data-a-plus-length'
     {max, min} = @parse-restriction container
     removes = container.children '.array-item' .children 'button.a-plus.remove-array-item'
@@ -33,13 +34,13 @@ class Form
     self = @
     button = $ '<button class="a-plus add-array-item"> + </button> '
     button.click (event)-> self.clicking-button-to-add-array-item @
-    container .prepend button 
+    container .prepend button
 
   insert-removing-item-button: (container)!->
     items = container.children '.a-plus.array-item'
     [@add-clicking-to-remove-this-item container, item for item in items]
 
-  clicking-button-to-add-array-item: (button)-> 
+  clicking-button-to-add-array-item: (button)->
     container = $ button .closest '.array-container'
     length = parse-int container.attr 'data-a-plus-length'
     if length is 0
@@ -47,35 +48,36 @@ class Form
       @change-fields-name item.show!, 'name' # 从0增加时，仅仅是恢复隐藏的。
       container.attr 'data-a-plus-length', 1
     else
-      @add-array-item container 
+      @add-array-item container
     @show-or-hide-adding-removing-buttons container ; false
 
-  add-array-item: (container)!-> 
+  add-array-item: (container)!->
     @form-data.add-array-item  container, (container, item)!~> @add-item-behavior container, item
-    
+
   add-item-behavior: (container, item)!->
     @add-clicking-to-remove-item-for-this-and-nested-children container, item
     @add-clicking-to-add-item-for-nested-children container, item
+    @clean-array-item-in-container item
 
   add-clicking-to-remove-this-item: (container, item)->
     self = @
     button = $ '<button class="a-plus remove-array-item"> × </button> '
     button.click (event)-> self.clicking-button-to-remove-array-item @
-    $ item .prepend button 
+    $ item .prepend button
 
   add-clicking-to-remove-item-for-this-and-nested-children: (container, item)->
     self = @
-    button = $ item .find 'button.a-plus.remove-array-item' 
+    button = $ item .find 'button.a-plus.remove-array-item'
     button.click (event)-> self.clicking-button-to-remove-array-item @
 
   clicking-button-to-remove-array-item: (button)->
     item = $ button .closest '.array-item'
     container = $ button .closest '.array-container'
     length = parse-int container.attr 'data-a-plus-length'
-    if length > 1 
-      item.remove! 
+    if length > 1
+      item.remove!
       @decrease-index-and-length container
-    else 
+    else
       @change-fields-name item.hide!, '_name_' # 当仅剩一个item，不能移除，以便将来添加时，能够有模板clone
       container.attr 'data-a-plus-length', 0
     @show-or-hide-adding-removing-buttons container ; false
@@ -84,16 +86,25 @@ class Form
     from = if _to is '_name_' then 'name' else '_name_'
     item.find "[#{from}]" .each -> $ @ .attr _to, ($ @ .attr from) .remove-attr from
 
+  clean-array-item-in-container: (item)->
+    for container in item.find '.array-container'
+      array-item = $ container .children '.array-item'
+      if array-item.length > 1
+        for i in [1 to array-item.length - 1]
+          array-item[i].remove!
+      $ container .attr 'data-a-plus-length', 1
+      @show-or-hide-adding-removing-buttons container
+    item.find 'input' .val ''
 
   decrease-index-and-length: (container)!->
     items = container.children '.a-plus.array-item'
     [@update-item-index item, index for item, index in items]
-    length = (container.attr 'data-a-plus-length') - 1 
+    length = (container.attr 'data-a-plus-length') - 1
     container.attr 'data-a-plus-length',  length
 
   add-clicking-to-add-item-for-nested-children: (container, item)->
     self = @
-    button = $ item .find 'button.a-plus.add-array-item' 
+    button = $ item .find 'button.a-plus.add-array-item'
     button.click (event)-> self.clicking-button-to-add-array-item @
     length = @increase-index-and-length container, item
 
@@ -111,9 +122,9 @@ class Form
   increase-index-and-length: (container, new-item)!->
     new-item-index = parse-int container.attr 'data-a-plus-length'
     @update-item-index new-item, new-item-index
-    container.attr 'data-a-plus-length', length = new-item-index + 1 
+    container.attr 'data-a-plus-length', length = new-item-index + 1
 
-  update-item-index: (item, index)!-> 
+  update-item-index: (item, index)!->
     old-item-name = $ item .attr 'name' or $ item .children '[name]' .attr 'name'
     new-item-name = (old-item-name[0 to -4].join '') + "[#{index}]"
     fields = $ item .find '[name]'
@@ -126,7 +137,7 @@ class Form
 
   f2d: (data)-> @form-data.f2d @form, data
 
-  d2f: (data)!-> 
+  d2f: (data)!->
     @form-data.d2f data, @form, (container, item)~> @add-item-behavior container, item
 
 form-manager = (form-data = @form-data)->
