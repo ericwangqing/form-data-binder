@@ -2,8 +2,7 @@ path-delimiter = '.'
 path-validation-regex = /^[a-zA-Z0-9.[\]]+$/
 array-key-regex = /(.+)\[(\d+)\]$/
 
-form-data = ->
-
+form-data =
   f2d: (form, data = {})->
     @form = $ form
     name-value-pairs = @form.serialize-array!
@@ -53,6 +52,7 @@ form-data = ->
     if Array.is-array data then @set-form-with-array data, path else @set-form-with-object data, path
 
   set-form-with-array: (data, path)!->
+    require! {Form-array-container: 'form-array-container'}
     container = @form.find '[name="#{path}"]'
     throw new Error "#{path} is an array but can't find its array-container" if not container.has-class 'array-container'
     container = new Form-array-container container
@@ -73,8 +73,10 @@ form-data = ->
       @set-form-with-data value, new-path
 
 
-if define? # AMD
-  define 'form-data', [], form-data
+if define?.cmd?
+  define 'form-data', (require, exports, module)->
+    require! ['form-array-container']
+    form-data
 else # other
   root = module?.exports ? @
-  root.form-data = form-data!
+  root.form-data = form-data

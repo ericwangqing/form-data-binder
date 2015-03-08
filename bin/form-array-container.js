@@ -73,7 +73,6 @@
       var i$, ref$, len$, container, arrayItem, j$, ref1$, len1$, i;
       for (i$ = 0, len$ = (ref$ = item.find('.array-container')).length; i$ < len$; ++i$) {
         container = ref$[i$];
-        console.log(container);
         container = new FormArrayContainer(container);
         arrayItem = container.getArrayItem();
         if (arrayItem.length > 1) {
@@ -218,8 +217,8 @@
     };
     return FormArrayContainer;
   }());
-  if (typeof define != 'undefined' && define !== null) {
-    define('form-array-container', [], function(){
+  if ((typeof define != 'undefined' && define !== null ? define.cmd : void 8) != null) {
+    define('form-array-container', function(){
       return FormArrayContainer;
     });
   } else {

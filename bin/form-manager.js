@@ -10,7 +10,8 @@
       this.renderContainers();
     }
     prototype.renderContainers = function(){
-      var i$, ref$, len$, container;
+      var FormArrayContainer, i$, ref$, len$, container;
+      FormArrayContainer = require('form-array-container');
       for (i$ = 0, len$ = (ref$ = this.form.find('.a-plus.array-container')).length; i$ < len$; ++i$) {
         container = ref$[i$];
         container = new FormArrayContainer(container);
@@ -36,9 +37,12 @@
       }
     };
   };
-  if (typeof define != 'undefined' && define !== null) {
-    define('form-manger', [], function(formData){
-      return formManger(formData);
+  if ((typeof define != 'undefined' && define !== null ? define.cmd : void 8) != null) {
+    define('form-manager', function(require, exports, module){
+      var formData, formArrayContainer;
+      formData = require('form-data');
+      formArrayContainer = require('form-array-container');
+      return formManager(formData);
     });
   } else {
     root = (ref$ = typeof module != 'undefined' && module !== null ? module.exports : void 8) != null ? ref$ : this;

@@ -1,25 +1,27 @@
 ### simple use（in jade）
 
-  label 题目
-    input(type='text' name='title')
-    label 要求
-    input(type='text' name='content')
-    label 时间
-    input(type='text' name='endTime')
+```
+label 题目
+input(type='text' name='title')
+label 要求
+input(type='text' name='content')
+label 时间
+input(type='text' name='endTime')
 
-  .a-plus.array-container(name='submissions' data-a-plus-restriction='[0, 2]' data-a-plus-length='1')
-      label 交付件列表
-      .a-plus.array-item.object(name='submissions[0]')
-        fieldset
-          legend 交付件
-          label 名称
-          input(type='text', name='submissions[0].name')
-          .a-plus.array-container(name='submissions[0].type' data-a-plus-restriction='[1, *]' data-a-plus-length='1')
-            label 文件格式
-            .a-plus.array-item
-              input(type='text' name='submissions[0].type[0]')
-          label 要求
-          input(type='text' name='submissions[0].description')
+.a-plus.array-container(name='submissions' data-a-plus-restriction='[0, 2]' data-a-plus-length='1')
+  label 交付件列表
+  .a-plus.array-item.object(name='submissions[0]')
+    fieldset
+      legend 交付件
+      label 名称
+      input(type='text', name='submissions[0].name')
+      .a-plus.array-container(name='submissions[0].type' data-a-plus-restriction='[1, *]' data-a-plus-length='1')
+        label 文件格式
+        .a-plus.array-item
+          input(type='text' name='submissions[0].type[0]')
+      label 要求
+      input(type='text' name='submissions[0].description')
+```
 
 ### 说明
 

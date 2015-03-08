@@ -43,7 +43,6 @@ class Form-array-container
 
   clean-array-item-in-container: (item)->
     for container in item.find '.array-container'
-      console.log container
       container = new Form-array-container container
       array-item = container.get-array-item!
       if array-item.length > 1
@@ -125,8 +124,8 @@ class Form-array-container
   parse-number: (number)-> if number is '*' then Infinity else parse-int number
 
 
-if define? # AMD
-  define 'form-array-container', [], -> Form-array-container
+if define?.cmd?
+  define 'form-array-container', -> Form-array-container
 else
   root = module?.exports ? @
   root.Form-array-container = Form-array-container
