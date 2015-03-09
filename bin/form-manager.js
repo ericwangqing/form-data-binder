@@ -48,7 +48,7 @@
       removes = container.children('.array-item').children('button.a-plus.remove-array-item');
       adds = container.children('button.a-plus.add-array-item');
       switch (false) {
-      case length !== min:
+      case !(length <= min):
         removes.hide();
         adds.show();
         break;
@@ -56,7 +56,7 @@
         removes.show();
         adds.show();
         break;
-      case length !== max:
+      case !(length >= max):
         removes.show();
         adds.hide();
       }
@@ -86,10 +86,10 @@
         item = container.children('.array-item');
         this.changeFieldsName(item.show(), 'name');
         container.attr('data-a-plus-length', 1);
+        this.showOrHideAddingRemovingButtons(container);
       } else {
         this.addArrayItem(container);
       }
-      this.showOrHideAddingRemovingButtons(container);
       return false;
     };
     prototype.addArrayItem = function(container){
@@ -101,6 +101,7 @@
     prototype.addItemBehavior = function(container, item){
       this.addClickingToRemoveItemForThisAndNestedChildren(container, item);
       this.addClickingToAddItemForNestedChildren(container, item);
+      this.showOrHideAddingRemovingButtons(container);
     };
     prototype.addClickingToRemoveThisItem = function(container, item){
       var self, button;

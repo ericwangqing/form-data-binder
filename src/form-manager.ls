@@ -25,9 +25,9 @@ class Form
     removes = container.children '.array-item' .children 'button.a-plus.remove-array-item'
     adds    = container.children 'button.a-plus.add-array-item'
     switch
-    | length is min       => removes.hide! ; adds.show!
+    | length <= min       => removes.hide! ; adds.show!
     | min < length < max  => removes.show! ; adds.show!
-    | length is max       => removes.show! ; adds.hide!
+    | length >= max       => removes.show! ; adds.hide!
 
   insert-adding-item-button: (container)!->
     self = @
@@ -46,9 +46,10 @@ class Form
       item = container.children '.array-item'
       @change-fields-name item.show!, 'name' # 从0增加时，仅仅是恢复隐藏的。
       container.attr 'data-a-plus-length', 1
+      @show-or-hide-adding-removing-buttons container 
     else
       @add-array-item container 
-    @show-or-hide-adding-removing-buttons container ; false
+    false
 
   add-array-item: (container)!-> 
     @form-data.add-array-item  container, (container, item)!~> @add-item-behavior container, item
@@ -56,6 +57,7 @@ class Form
   add-item-behavior: (container, item)!->
     @add-clicking-to-remove-item-for-this-and-nested-children container, item
     @add-clicking-to-add-item-for-nested-children container, item
+    @show-or-hide-adding-removing-buttons container
 
   add-clicking-to-remove-this-item: (container, item)->
     self = @

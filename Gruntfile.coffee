@@ -53,7 +53,7 @@ module.exports = (grunt) ->
       all:
         expand: true
         cwd: "src/"
-        src: ["**/*.ls"]
+        src: ['**/**.ls']
         dest: "bin/"
         ext: ".js"
 
