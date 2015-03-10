@@ -217,8 +217,8 @@
     };
     return FormArrayContainer;
   }());
-  if ((typeof define != 'undefined' && define !== null ? define.cmd : void 8) != null) {
-    define('form-array-container', function(){
+  if (typeof define != 'undefined' && define !== null) {
+    define('Form-array-container', [], function(){
       return FormArrayContainer;
     });
   } else {

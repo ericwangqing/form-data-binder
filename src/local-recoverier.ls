@@ -15,11 +15,13 @@ class Local-recoverier
     # 2. 当form保存后，把对应的localStorage清空
 
 
-if define?.cmd?
-  define 'local-recoverier-manager', ->
-    create: (selector)-> new Local-recoverier selector
+local-recoverier-manager = ->
+  create: (selector)-> new Local-recoverier selector
+
+if define? # AMD
+  define 'local-recoverier-manager', [], local-recoverier-manager
 else # other
   root = module?.exports ? @
-  root.Local-recoverier = Local-recoverier
+  root.local-recoverier-manager = local-recoverier-manager!
 
 

@@ -124,8 +124,8 @@ class Form-array-container
   parse-number: (number)-> if number is '*' then Infinity else parse-int number
 
 
-if define?.cmd?
-  define 'form-array-container', -> Form-array-container
+if define? # AMD
+  define 'Form-array-container', [], -> Form-array-container
 else
   root = module?.exports ? @
   root.Form-array-container = Form-array-container

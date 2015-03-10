@@ -1,5 +1,5 @@
 (function(){
-  var SELECTOR, LocalRecoverier, root, ref$;
+  var SELECTOR, LocalRecoverier, localRecoverierManager, root, ref$;
   SELECTOR = 'input selector textarea';
   LocalRecoverier = (function(){
     LocalRecoverier.displayName = 'LocalRecoverier';
@@ -13,16 +13,17 @@
     prototype.bindEventToForm = function(){};
     return LocalRecoverier;
   }());
-  if ((typeof define != 'undefined' && define !== null ? define.cmd : void 8) != null) {
-    define('local-recoverier-manager', function(){
-      return {
-        create: function(selector){
-          return new LocalRecoverier(selector);
-        }
-      };
-    });
+  localRecoverierManager = function(){
+    return {
+      create: function(selector){
+        return new LocalRecoverier(selector);
+      }
+    };
+  };
+  if (typeof define != 'undefined' && define !== null) {
+    define('local-recoverier-manager', [], localRecoverierManager);
   } else {
     root = (ref$ = typeof module != 'undefined' && module !== null ? module.exports : void 8) != null ? ref$ : this;
-    root.LocalRecoverier = LocalRecoverier;
+    root.localRecoverierManager = localRecoverierManager();
   }
 }).call(this);
