@@ -116,7 +116,7 @@ spec = ->
                 'height': 1
                 'css': null 
                 'valid': "data-parsley-minlength='20' data-parsley-trigger='keyup' required "
-            ...
+          ...
 
 if define? # a+运行时
   define 'spec', [], spec 
