@@ -40,13 +40,14 @@ fieldset-maker = (util)->
     root.append container = (
       $ '<div>' .add-class 'a-plus array-container'
       .attr 'name', spec.name 
-      .attr 'data-a-plus-restriction', spec.multi
+      .attr 'data-a-plus-restriction', @get-multi spec.multi
       .attr 'data-a-plus-length', 1
       .append ($ '<label>' .text spec.label) 
       .append item = $ '<div class="a-plus array-item">'
     )
     item
 
+  get-multi: (multi)-> if typeof multi is 'string' then multi else "[#{multi[0]}, #{multi[1]}]"
 
   add-field: (row, spec)!->
     root = if isObject = (spec.name.index-of '.') > 0 then @add-object-div row, spec.name else row
@@ -67,10 +68,21 @@ fieldset-maker = (util)->
 
   get-control: (field-type, valid)->
     [name, type, ...constrains] = field-type.split '.'
-    valid = valid ? ''
+    valid = @get-validation-descriptions valid
     control = $ "<#{name} type='#{type}' #{valid}>"
     [@add-constrain control, constrain for constrain in constrains]
     control
+
+  get-validation-descriptions: (valid)->
+    return valid if typeof valid is 'string'
+    [@get-validation-description key, value for key, value of valid].join ' '
+
+  get-validation-description: (key, value)->
+    switch key
+    | 'min'        =>  "data-parsley-minlength='#{value}'"
+    | 'required'   =>  (if value then 'required' else '')
+    | otherwise    =>  ''
+
 
   add-constrain: (control, constrain)->
     switch constrain

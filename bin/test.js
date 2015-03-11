@@ -1,9 +1,9 @@
 (function(){
   $(function(){
-    var detailSpec, form;
-    detailSpec = detailSpecGenerator.generate(widgetSpec);
+    var form;
+    window.detailSpec = detailSpecGenerator.generate(widgetSpec);
     console.log(detailSpec);
-    form = $('form#assignment').append(fieldsetMaker.make(spec));
+    form = $('form#assignment').append(fieldsetMaker.make(detailSpec));
     return window.assignmentForm = formManager.create(form);
   });
 }).call(this);

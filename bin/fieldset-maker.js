@@ -60,8 +60,15 @@
       },
       addArrayContainer: function(root, spec){
         var container, item;
-        root.append(container = $('<div>').addClass('a-plus array-container').attr('name', spec.name).attr('data-a-plus-restriction', spec.multi).attr('data-a-plus-length', 1).append($('<label>').text(spec.label)).append(item = $('<div class="a-plus array-item">')));
+        root.append(container = $('<div>').addClass('a-plus array-container').attr('name', spec.name).attr('data-a-plus-restriction', this.getMulti(spec.multi)).attr('data-a-plus-length', 1).append($('<label>').text(spec.label)).append(item = $('<div class="a-plus array-item">')));
         return item;
+      },
+      getMulti: function(multi){
+        if (typeof multi === 'string') {
+          return multi;
+        } else {
+          return "[" + multi[0] + ", " + multi[1] + "]";
+        }
       },
       addField: function(row, spec){
         var root, isObject, field;
@@ -88,13 +95,42 @@
       getControl: function(fieldType, valid){
         var ref$, name, type, constrains, control, i$, len$, constrain;
         ref$ = fieldType.split('.'), name = ref$[0], type = ref$[1], constrains = slice$.call(ref$, 2);
-        valid = valid != null ? valid : '';
+        valid = this.getValidationDescriptions(valid);
         control = $("<" + name + " type='" + type + "' " + valid + ">");
         for (i$ = 0, len$ = constrains.length; i$ < len$; ++i$) {
           constrain = constrains[i$];
           this.addConstrain(control, constrain);
         }
         return control;
+      },
+      getValidationDescriptions: function(valid){
+        var key, value;
+        if (typeof valid === 'string') {
+          return valid;
+        }
+        return (function(){
+          var ref$, results$ = [];
+          for (key in ref$ = valid) {
+            value = ref$[key];
+            results$.push(this.getValidationDescription(key, value));
+          }
+          return results$;
+        }.call(this)).join(' ');
+      },
+      getValidationDescription: function(key, value){
+        switch (key) {
+        case 'min':
+          return "data-parsley-minlength='" + value + "'";
+        case 'required':
+          if (value) {
+            return 'required';
+          } else {
+            return '';
+          }
+          break;
+        default:
+          return '';
+        }
       },
       addConstrain: function(control, constrain){
         switch (constrain) {

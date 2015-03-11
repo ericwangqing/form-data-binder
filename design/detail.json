@@ -1,0 +1,108 @@
+{
+  "name": "creaet_assignment",
+  "label": "布置作业",
+  "rows": [
+    {
+      "width": 4,
+      "height": 1,
+      "fields": [
+        {
+          "name": "title",
+          "width": 3,
+          "valid": {
+            "min": 20
+          },
+          "fieldType": "input.text",
+          "label": "题目",
+          "placeholder": "作业题目"
+        },
+        {
+          "name": "assignedBy.name",
+          "width": 1,
+          "fieldType": "input.text",
+          "label": "出题老师",
+          "tooltip": "今天已经出了#{getTodayAssignemtsOfUser}题目"
+        }
+      ]
+    },
+    {
+      "width": 3,
+      "height": 1,
+      "fields": [
+        {
+          "name": "forStudents",
+          "width": 1,
+          "ref": "students",
+          "multi": "[1, 10]",
+          "fieldType": "input.text",
+          "label": "参与学生列表"
+        },
+        {
+          "name": "restrictions.endTime",
+          "width": 1,
+          "fieldType": "input.text",
+          "label": "截止时间",
+          "tooltip": "截止后，将不能够提交"
+        },
+        {
+          "name": "restrictions.submitTimes",
+          "width": 1,
+          "fieldType": "input.text",
+          "label": "最多提交次数"
+        }
+      ]
+    },
+    {
+      "width": 1,
+      "height": 2,
+      "fields": [
+        {
+          "name": "requirement",
+          "width": 1,
+          "valid": {
+            "min": 20
+          },
+          "fieldType": "input.text",
+          "label": "具体要求",
+          "placeholder": "请输入作业要求的内容"
+        }
+      ]
+    },
+    {
+      "name": "submissions",
+      "label": "交付件列表",
+      "multi": "[1, 2]",
+      "rows": [
+        {
+          "width": 3,
+          "height": 1,
+          "fields": [
+            {
+              "name": "submissions[].name",
+              "width": 1,
+              "fieldType": "input.text",
+              "label": "名称",
+              "placeholder": "交付件名称"
+            },
+            {
+              "name": "submissions[].filetype",
+              "width": 1,
+              "multi": [
+                1,
+                2
+              ],
+              "fieldType": "input.text",
+              "label": "类型"
+            },
+            {
+              "name": "submissions[].copiesAmount",
+              "width": 1,
+              "fieldType": "input.text",
+              "label": "总量"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
