@@ -8,7 +8,7 @@ widget-spec = ->
     restrictions:
       end-time: null
       submit-times: null
-    assgined-by: 
+    assigned-by: 
       '@ref': 'user', 
       _id: null
       name: null
@@ -33,7 +33,7 @@ widget-spec = ->
       #   
       #   引用： ref: '引用对象（obj.path）'，引用对象为简单类型时，仅仅是一个域，为复杂类型时，可全部引用 ref: 'user'；也可选择引用，ref: 'user': ['_id', 'account.name']      #   
 
-  description:
+  descriptions:
     labels:
       'title': '题目'
       'assigned-by.name': '出题老师'
@@ -43,7 +43,7 @@ widget-spec = ->
       'requirement': '具体要求'
       'submissions': '交付件列表'
       'submissions[].name': '名称'
-      'submissions[].type': '类型'
+      'submissions[].filetype': '类型'
       'submissions[].copies-amount': '总量'
 
     placeholders:
@@ -77,9 +77,9 @@ widget-spec = ->
       ]
 
 
-    behaviors:
-      '作业内容': validate: 'keyup'
-      '出题老师': pop: 'user.view.pop'
+  behaviors:
+    '作业内容': validate: 'keyup'
+    '出题老师': pop: 'user.view.pop'
 
 if define? # a+运行时
   define 'widget-spec', [], widget-spec 

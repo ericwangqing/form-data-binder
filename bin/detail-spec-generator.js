@@ -7,7 +7,7 @@
         this.name = arg$.name, this.label = arg$.label, this.folderable = arg$.folderable, model = arg$.model, descriptions = arg$.descriptions, styles = arg$.styles, behaviors = arg$.behaviors;
         this.clear();
         this.parseModel(model);
-        this.parseDescriptions(this._description = descriptions);
+        this.parseDescriptions(this._descriptions = descriptions);
         this.parseStyles(styles);
         this.parseBehaviors(behaviors);
         return this.createDetailSpec();
@@ -21,20 +21,19 @@
         return this.behaviors = {};
       },
       createDetailSpec: function(){
-        var spec, rowSpec;
+        var spec, res$, i$, ref$, len$, rowSpec;
         spec = {
           name: this.name,
           label: this.label,
           folderable: this.folderable
         };
-        return spec.rows = (function(){
-          var i$, ref$, len$, results$ = [];
-          for (i$ = 0, len$ = (ref$ = this.styles.rows).length; i$ < len$; ++i$) {
-            rowSpec = ref$[i$];
-            results$.push(this.createRow(rowSpec));
-          }
-          return results$;
-        }.call(this));
+        res$ = [];
+        for (i$ = 0, len$ = (ref$ = this.styles.rows).length; i$ < len$; ++i$) {
+          rowSpec = ref$[i$];
+          res$.push(this.createRow(rowSpec));
+        }
+        spec.rows = res$;
+        return spec;
       },
       createRow: function(spec){
         var row, res$, i$, ref$, len$, rowSpec, fieldSpec;
@@ -47,7 +46,7 @@
           res$ = [];
           for (i$ = 0, len$ = (ref$ = spec.rows).length; i$ < len$; ++i$) {
             rowSpec = ref$[i$];
-            res$.push(this.createRow);
+            res$.push(this.createRow(rowSpec));
           }
           row.rows = res$;
         } else {
@@ -59,15 +58,16 @@
           res$ = [];
           for (i$ = 0, len$ = (ref$ = spec.fields).length; i$ < len$; ++i$) {
             fieldSpec = ref$[i$];
-            res$.push(this.createField);
+            res$.push(this.createField(fieldSpec));
           }
           row.fields = res$;
         }
         return row;
       },
       createField: function(spec){
-        var ref$;
-        field.name = spec.name, field.width = spec.width, field.height = spec.height, field.css = spec.css;
+        var field, ref$;
+        field = {};
+        field.name = spec.name, field.width = spec.width, field.css = spec.css;
         ref$ = this.model[spec.name], field.valid = ref$.valid, field.ref = ref$.ref, field.value = ref$.value, field.multi = ref$.multi, field.fieldType = ref$.fieldType;
         ref$ = this.descriptions[spec.name], field.label = ref$.label, field.placeholder = ref$.placeholder, field.tooltip = ref$.tooltip;
         return field;
@@ -79,25 +79,21 @@
         this._parseModel(spec);
       },
       _parseModel: function(spec){
-        var key, value;
+        var key, value, ref$;
         for (key in spec) {
           value = spec[key];
-          if (typeof value !== 'function') {
-            if (this.isAttrNode(key, value)) {
-              this.addModelSpec(key, value);
-            } else if (key.indexOf('@') === 0) {
-              this.pushAncestorDirectives(key, value);
-              this.path = this.path + "[]";
-              continue;
-            } else {
-              this.path = this.movePathDown(key);
-              this.deep++;
-              this._parseModel(value);
-              this.popAncestorDirectives();
-              this.deep--;
-              this.path = this.movePathUp();
-            }
+          if (typeof value === 'function' || this.isDirective(key)) {
+            continue;
           }
+          this.addModelSpec(key, value);
+          this.path = this.movePathDown(key);
+          if (((ref$ = this.model[this.path]) != null ? ref$.multi : void 8) != null) {
+            this.path = this.path + "[]";
+          }
+          if (value) {
+            this._parseModel(value);
+          }
+          this.path = this.movePathUp();
         }
       },
       movePathDown: function(key){
@@ -110,28 +106,26 @@
       movePathUp: function(key){
         return slice$.call(this.path.split('.'), 0, -2 + 1 || 9e9).join('.');
       },
-      isAttrNode: function(key, value){
-        var i$, ref$, len$;
-        if (key.indexOf('@') === 0) {
-          return false;
-        }
-        if (value != null && typeof value === 'object') {
-          for (i$ = 0, len$ = (ref$ = Object.keys(value)).length; i$ < len$; ++i$) {
-            key = ref$[i$];
-            if (key.indexOf('@') < 0) {
-              return false;
-            }
+      addModelSpec: function(attr, obj){
+        var allDirectiveKeys, fullAttrPath, key, value, ref$;
+        allDirectiveKeys = true;
+        fullAttrPath = this.movePathDown(attr);
+        for (key in obj) {
+          value = obj[key];
+          if (!this.isDirective(key)) {
+            allDirectiveKeys = false;
+            continue;
           }
-          return true;
-        } else {
-          console.log("Some wrong, we are not supposed to be here!");
-          return true;
+          (ref$ = this.model)[fullAttrPath] || (ref$[fullAttrPath] = {});
+          this.model[fullAttrPath][this.getDirectiveKey(key)] = value;
+        }
+        if (allDirectiveKeys && !((ref$ = this.model[fullAttrPath]) != null && ref$.fieldType)) {
+          (ref$ = this.model)[fullAttrPath] || (ref$[fullAttrPath] = {});
+          return this.model[fullAttrPath].fieldType = 'input.text';
         }
       },
-      addModelSpec: function(key, directiveObj){
-        var spec;
-        spec = this.getDefaultSpec();
-        return this.model[this.movePathDown(key)] = this.extendSpec(spec, directiveObj);
+      isDirective: function(key){
+        return key.indexOf('@') === 0;
       },
       getDefaultSpec: function(){
         return {
@@ -140,7 +134,6 @@
       },
       extendSpec: function(spec, directiveObj){
         spec = {};
-        this.addAncestorDirectives(spec);
         this.addDirectives(spec, directiveObj);
         return spec;
       },
@@ -194,6 +187,9 @@
           (fn$.call(this, i$, labels[i$]));
         }
         function fn$(key, label){
+          var ref$;
+          key = key.camelize();
+          (ref$ = this.descriptions)[key] || (ref$[key] = {});
           this.descriptions[key].label = label;
         }
       },
@@ -203,6 +199,8 @@
           (fn$.call(this, i$, placeholders[i$]));
         }
         function fn$(keyOrLabel, placeholder){
+          var ref$, key$;
+          (ref$ = this.descriptions)[key$ = this.getPathKey(keyOrLabel)] || (ref$[key$] = {});
           this.descriptions[this.getPathKey(keyOrLabel)].placeholder = placeholder;
         }
       },
@@ -212,22 +210,38 @@
           (fn$.call(this, i$, tooltips[i$]));
         }
         function fn$(keyOrLabel, tooltip){
+          var ref$, key$;
+          (ref$ = this.descriptions)[key$ = this.getPathKey(keyOrLabel)] || (ref$[key$] = {});
           this.descriptions[this.getPathKey(keyOrLabel)].tooltip = tooltip;
         }
       },
       getPathKey: function(keyOrLabel){
-        this.model[keyOrLabel] == null && this.findKey(this._descriptions, keyOrLabel);
+        var key;
+        key = keyOrLabel.camelize();
+        if (this.model[keyOrLabel]) {
+          return key;
+        } else {
+          return this.findKey(keyOrLabel);
+        }
       },
-      findKey: function(targetValue, object){
-        var i$, own$ = {}.hasOwnProperty, results$ = [];
-        for (i$ in object) if (own$.call(object, i$)) {
-          if (object[i$] === targetValue) {
-            results$.push((fn$.call(this, i$, object[i$])));
+      findKey: function(label){
+        var key, ref$, description;
+        for (key in ref$ = this.descriptions) {
+          description = ref$[key];
+          if (description.label === label) {
+            return key;
           }
         }
-        return results$;
-        function fn$(key, value){
-          return key;
+      },
+      parseBehaviors: function(behaviors){
+        var i$, own$ = {}.hasOwnProperty;
+        for (i$ in behaviors) if (own$.call(behaviors, i$)) {
+          (fn$.call(this, i$, behaviors[i$]));
+        }
+        function fn$(key, behavior){
+          var name;
+          name = this.getPathKey(key);
+          this.behaviors[name] = behavior;
         }
       },
       parseStyles: function(arg$){
@@ -243,48 +257,55 @@
           if ((rowsCss != null ? rowsCss[index] : void 8) != null) {
             rowSpec.css = rowsCss[index];
           }
+          this.styles.rows.push(rowSpec);
         }
       },
       parseRow: function(row, fieldCss){
-        var rowSpec, name, last, fieldName;
+        var rowSpec, name, res$, i$, ref$, len$, last, fieldName;
         rowSpec = {};
         if (this.isMultiRows(row)) {
           rowSpec.name = name = this.getPathKey(row[0]);
           rowSpec.label = this.descriptions[name].label;
           rowSpec.multi = this.model[name].multi;
-          return rowSpec.rows = (function(){
-            var i$, ref$, len$, results$ = [];
-            for (i$ = 0, len$ = (ref$ = slice$.call(row, 1, -1 + 1 || 9e9)).length; i$ < len$; ++i$) {
-              rowSpec = ref$[i$];
-              results$.push(this.parseRow);
-            }
-            return results$;
-          }.call(this));
+          res$ = [];
+          for (i$ = 0, len$ = (ref$ = slice$.call(row, 1, -1 + 1 || 9e9)).length; i$ < len$; ++i$) {
+            row = ref$[i$];
+            res$.push(this.parseRow(row, fieldCss));
+          }
+          rowSpec.rows = res$;
         } else {
-          if (typeof (last = row[row.length - 1] === 'number')) {
+          if (typeof (last = row[row.length - 1]) === 'number') {
             rowSpec.height = last;
             row = slice$.call(row, 0, -2 + 1 || 9e9);
+          } else {
+            rowSpec.height = 1;
           }
-          return rowSpec.fields = (function(){
-            var i$, ref$, len$, results$ = [];
-            for (i$ = 0, len$ = (ref$ = row).length; i$ < len$; ++i$) {
-              fieldName = ref$[i$];
-              results$.push(this.parseField(fieldName, fieldCss));
-            }
-            return results$;
-          }.call(this));
+          res$ = [];
+          for (i$ = 0, len$ = row.length; i$ < len$; ++i$) {
+            fieldName = row[i$];
+            res$.push(this.parseField(fieldName, fieldCss));
+          }
+          rowSpec.fields = res$;
+          rowSpec.width = rowSpec.fields.reduce(function(pre, field){
+            return pre + field.width;
+          }, 0);
         }
+        return rowSpec;
+      },
+      isMultiRows: function(row){
+        return row.length >= 2 && Array.isArray(row[1]);
       },
       parseField: function(name, fieldCss){
         var isWidthSpecified, ref$, _all_, width;
-        if (isWidthSpecified = name[name.length - 2] === ')') {
+        if (isWidthSpecified = name[name.length - 1] === ')') {
           ref$ = name.match(/(^.+)\((\d+)\)$/), _all_ = ref$[0], name = ref$[1], width = ref$[2];
         }
         name = this.getPathKey(name);
+        width = width != null ? parseInt(width) : 1;
         return {
           name: name,
           width: width,
-          css: fieldCss[name]
+          css: fieldCss != null ? fieldCss[name] : void 8
         };
       }
     };

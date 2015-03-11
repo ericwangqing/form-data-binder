@@ -1,7 +1,7 @@
 (function(){
   $(function(){
-    var detaiSpec, form;
-    detaiSpec = detailSpecGenerator.generate(widgetSpec);
+    var detailSpec, form;
+    detailSpec = detailSpecGenerator.generate(widgetSpec);
     console.log(detailSpec);
     form = $('form#assignment').append(fieldsetMaker.make(spec));
     return window.assignmentForm = formManager.create(form);

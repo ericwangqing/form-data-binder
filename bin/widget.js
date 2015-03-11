@@ -19,7 +19,7 @@
           endTime: null,
           submitTimes: null
         },
-        assginedBy: {
+        assignedBy: {
           '@ref': 'user',
           _id: null,
           name: null
@@ -41,7 +41,7 @@
           description: null
         }
       },
-      description: {
+      descriptions: {
         labels: {
           'title': '题目',
           'assigned-by.name': '出题老师',
@@ -51,7 +51,7 @@
           'requirement': '具体要求',
           'submissions': '交付件列表',
           'submissions[].name': '名称',
-          'submissions[].type': '类型',
+          'submissions[].filetype': '类型',
           'submissions[].copies-amount': '总量'
         },
         placeholders: {
@@ -66,14 +66,14 @@
       },
       styles: {
         type: 'gridforms',
-        rows: [['题目(3)', '出题老师'], ['参与学生列表', '截止时间', '最多提交次数'], ['具体要求', 2], ['交付件列表', ['名称', '类型', '总量']]],
-        behaviors: {
-          '作业内容': {
-            validate: 'keyup'
-          },
-          '出题老师': {
-            pop: 'user.view.pop'
-          }
+        rows: [['题目(3)', '出题老师'], ['参与学生列表', '截止时间', '最多提交次数'], ['具体要求', 2], ['交付件列表', ['名称', '类型', '总量']]]
+      },
+      behaviors: {
+        '作业内容': {
+          validate: 'keyup'
+        },
+        '出题老师': {
+          pop: 'user.view.pop'
         }
       }
     };
