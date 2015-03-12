@@ -7,8 +7,15 @@ head
   script(src='util.js') 
   script(src='form-data.js') 
   script(src='form-manager.js') 
-  script(src='fieldset-maker.js') 
+  script(src='dom-creators/create-widget-dom-creator.js') 
+  script(src='dom-creators/edit-widget-dom-creator.js') 
+  script(src='dom-creators/view-widget-dom-creator.js') 
+  script(src='dom-creators/list-widgets-dom-creator.js') 
+  script(src='widgets-manager.js') 
   script(src='assignment.js') 
+  script(src='model-parser.js') 
+  script(src='descriptions-parser.js') 
+  script(src='appearance-parser.js') 
   script(src='detail-spec-generator.js') 
   script(src='widget.js') 
   script(src='test.js') 
@@ -17,7 +24,7 @@ head
 
 body
   h1 fieldset-maker-driven-case: assginment form
-  form.grid-form#assignment
+  form.grid-form#assignment 
 
     //- label 作业提交表单
     //- textarea(name='assignmentFormDesign')

@@ -2,41 +2,43 @@
   var widgetSpec, root, ref$;
   widgetSpec = function(){
     return {
-      name: 'creaet_assignment',
+      type: 'create',
       label: '布置作业',
       model: {
-        title: {
-          '@valid': {
-            min: 20
-          }
-        },
-        requirement: {
-          '@valid': {
-            min: 20
-          }
-        },
-        restrictions: {
-          endTime: null,
-          submitTimes: null
-        },
-        assignedBy: {
-          '@ref': 'user.name'
-        },
-        forStudents: {
-          '@multi': '[1, 10]',
-          '@ref': 'students'
-        },
-        submissions: {
-          '@multi': '[1, 2]',
-          name: null,
-          filetype: {
-            '@multi': [1, 2],
-            '@candidates': ['zip', 'pdf', 'doc', '*']
+        'assignment': {
+          title: {
+            '@valid': {
+              min: 20
+            }
           },
-          copiesAmount: {
-            '@type': 'number'
+          requirement: {
+            '@valid': {
+              min: 20
+            }
           },
-          description: null
+          restrictions: {
+            endTime: null,
+            submitTimes: null
+          },
+          assignedBy: {
+            '@ref': 'user.name'
+          },
+          forStudents: {
+            '@multi': '[1, 10]',
+            '@ref': 'students'
+          },
+          submissions: {
+            '@multi': '[1, 2]',
+            name: null,
+            filetype: {
+              '@multi': [1, 2],
+              '@candidates': ['zip', 'pdf', 'doc', '*']
+            },
+            copiesAmount: {
+              '@type': 'number'
+            },
+            description: null
+          }
         }
       },
       descriptions: {
@@ -62,7 +64,7 @@
           '出题老师': '今天已经出了#{getTodayAssignemtsOfUser}题目'
         }
       },
-      styles: {
+      appearance: {
         type: 'gridforms',
         rows: [['题目(3)', '出题老师'], ['参与学生列表', '截止时间', '最多提交次数'], ['具体要求', 2], ['交付件列表', ['名称', '类型', '总量']]]
       },

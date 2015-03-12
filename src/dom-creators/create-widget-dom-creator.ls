@@ -1,8 +1,6 @@
 # 根据xxx.widget.detail.spec（json）对象，生成form中的fieldset对象。一个widget就对应到一个fieldset。
-
-
-fieldset-maker = (util)->
-  make: (spec)->
+create-widget-dom-creator = (util)->
+  create: (spec)->
     @objects-divs-stack = []
     @format-name spec
 
@@ -128,8 +126,8 @@ fieldset-maker = (util)->
 
 
 if define? # a+运行时
-  define 'fieldset-maker', ['util'], fieldset-maker 
+  define 'create-widget-dom-creator', ['util'], create-widget-dom-creator 
 else # b-plus开发时
   root = module?.exports ? @
-  root.fieldset-maker = fieldset-maker!
+  root.create-widget-dom-creator = create-widget-dom-creator!
 

@@ -1,8 +1,8 @@
 (function(){
-  var fieldsetMaker, root, ref$, slice$ = [].slice;
-  fieldsetMaker = function(util){
+  var createWidgetDomCreator, root, ref$, slice$ = [].slice;
+  createWidgetDomCreator = function(util){
     return {
-      make: function(spec){
+      create: function(spec){
         var fieldset, i$, ref$, len$, row;
         this.objectsDivsStack = [];
         this.formatName(spec);
@@ -206,9 +206,9 @@
     };
   };
   if (typeof define != 'undefined' && define !== null) {
-    define('fieldset-maker', ['util'], fieldsetMaker);
+    define('create-widget-dom-creator', ['util'], createWidgetDomCreator);
   } else {
     root = (ref$ = typeof module != 'undefined' && module !== null ? module.exports : void 8) != null ? ref$ : this;
-    root.fieldsetMaker = fieldsetMaker();
+    root.createWidgetDomCreator = createWidgetDomCreator();
   }
 }).call(this);

@@ -1,7 +1,7 @@
 widget-spec = ->
-  name: 'creaet_assignment'
+  type: 'create'
   label: '布置作业'
-  model: 
+  model: 'assignment':
     # '@options': {required: true} # 这里可以修改一些默认值，也可以在属性定义中单独定义
     title: '@valid': {min: 20}
     requirement: '@valid': {min: 20}
@@ -54,7 +54,7 @@ widget-spec = ->
       '出题老师': '今天已经出了#{getTodayAssignemtsOfUser}题目'
 
 
-  styles:
+  appearance:
     type: 'gridforms'
     # rows:
     #   <[ 题目(3)  出题老师  ]>
