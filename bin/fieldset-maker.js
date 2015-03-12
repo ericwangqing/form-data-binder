@@ -81,7 +81,23 @@
         }
       },
       addSingleValueField: function(root, spec){
-        root.append($('<label>').text(spec.label)).append(this.getInput(spec).attr('name', spec.name));
+        var newRoot, refHiddenInput;
+        root.append($('<label>').text(spec.label));
+        if (spec.ref) {
+          root.append(newRoot = $("<div class='a-plus object' name='" + spec.name + "'>"));
+          root = newRoot;
+          root.append(refHiddenInput = $("<input type='hidden' name='" + spec.name + "._id' />"));
+        }
+        root.append(this.getInput(spec).attr('name', this.getFieldName(spec)));
+      },
+      getFieldName: function(spec){
+        var ref$, model, i$, middlePath, attr, name;
+        if (spec.ref) {
+          ref$ = spec.ref.split('.'), model = ref$[0], middlePath = 1 < (i$ = ref$.length - 1) ? slice$.call(ref$, 1, i$) : (i$ = 1, []), attr = ref$[i$];
+          return name = spec.name + "." + attr;
+        } else {
+          return spec.name;
+        }
       },
       addMultiValueField: function(root, spec){
         var item;
@@ -96,7 +112,7 @@
         var ref$, name, type, constrains, control, i$, len$, constrain;
         ref$ = fieldType.split('.'), name = ref$[0], type = ref$[1], constrains = slice$.call(ref$, 2);
         valid = this.getValidationDescriptions(valid);
-        control = $("<" + name + " type='" + type + "' " + valid + ">");
+        control = $("<" + name + " type='" + type + "' " + valid + " />");
         for (i$ = 0, len$ = constrains.length; i$ < len$; ++i$) {
           constrain = constrains[i$];
           this.addConstrain(control, constrain);

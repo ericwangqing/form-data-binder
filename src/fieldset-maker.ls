@@ -55,7 +55,19 @@ fieldset-maker = (util)->
     if spec.multi then @add-multi-value-field field, spec else @add-single-value-field field, spec
 
   add-single-value-field: (root, spec)!->
-    root.append ($ '<label>' .text spec.label) .append (@get-input spec .attr 'name', spec.name)
+    root.append ($ '<label>' .text spec.label) 
+    if spec.ref
+      root.append new-root = $ "<div class='a-plus object' name='#{spec.name}'>"
+      root = new-root
+      root.append (ref-hidden-input = $ "<input type='hidden' name='#{spec.name}._id' />") 
+    root.append (@get-input spec .attr 'name', @get-field-name spec)
+
+  get-field-name: (spec)->
+    if spec.ref
+      [model, ...middle-path, attr] = spec.ref.split '.'
+      name = "#{spec.name}.#{attr}"
+    else
+      spec.name
 
   add-multi-value-field: (root, spec)!->
     item = @add-array-container root, spec
@@ -64,12 +76,12 @@ fieldset-maker = (util)->
   get-input: (spec)-> 
     input = (@get-control spec.field-type, spec.valid)
       .attr 'title', spec.tooltip 
-      .attr 'placeholder', spec.placeholder 
+      .attr 'placeholder', spec.placeholder  
 
   get-control: (field-type, valid)->
     [name, type, ...constrains] = field-type.split '.'
     valid = @get-validation-descriptions valid
-    control = $ "<#{name} type='#{type}' #{valid}>"
+    control = $ "<#{name} type='#{type}' #{valid} />"
     [@add-constrain control, constrain for constrain in constrains]
     control
 

@@ -79,9 +79,19 @@ detail-spec-generator = ->
       (all-directive-keys = false ; continue) if not @is-directive key
       @model[full-attr-path] ||= {}
       @model[full-attr-path][@get-directive-key key] = value
-    if all-directive-keys and not @model[full-attr-path]?field-type 
+    if all-directive-keys and not @model[full-attr-path]?field-type
       @model[full-attr-path] ||= {} # 默认值
-      @model[full-attr-path].field-type = 'input.text' # 默认值
+      @model[full-attr-path].field-type =  @get-field-type-by-attr-name full-attr-path 
+
+  get-field-type-by-attr-name: (attr)->
+    return "input.#{@model[attr].type}" if @model[attr].type?
+    last = (start, end)-> attr.substr (attr.length - start), (attr.length - end) .to-lower-case!
+    switch
+    | attr is '_id'              =>    'input.hidden'
+    | (last 4, 1) is 'time'      =>    'input.datetime-local'
+    | (last 5, 1) is 'count'     =>    'input.number'
+    | (last 6, 1) is 'amount'    =>    'input.number'
+    | otherwise                  =>    'input.text'
 
   is-directive: (key)-> (key.index-of '@') is 0
 

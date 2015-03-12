@@ -20,9 +20,7 @@
           submitTimes: null
         },
         assignedBy: {
-          '@ref': 'user',
-          _id: null,
-          name: null
+          '@ref': 'user.name'
         },
         forStudents: {
           '@multi': '[1, 10]',
@@ -44,7 +42,7 @@
       descriptions: {
         labels: {
           'title': '题目',
-          'assigned-by.name': '出题老师',
+          'assigned-by': '出题老师',
           'for-students': '参与学生列表',
           'restrictions.end-time': '截止时间',
           'restrictions.submit-times': '最多提交次数',

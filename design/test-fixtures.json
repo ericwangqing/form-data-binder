@@ -9,25 +9,23 @@
     "张志恒"
   ],
   "restrictions": {
-    "endTime": "2015-12-12T00:00",
-    "submitTimes": ""
+    "endTime": "2015-01-11T13:12",
+    "submitTimes": "2"
   },
   "requirement": "分析大气污染成因",
   "submissions": [
     {
       "name": "论文",
-      "type": [
+      "filetype": [
+        "pdf",
         "doc"
-      ],
-      "t[1]": [
-        "pdf"
       ],
       "copiesAmount": "1"
     },
     {
       "name": "系统",
-      "t[0]": [
-        "软件安装包"
+      "filetype": [
+        "安装包"
       ],
       "copiesAmount": "1"
     }

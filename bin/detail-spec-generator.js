@@ -121,7 +121,28 @@
         }
         if (allDirectiveKeys && !((ref$ = this.model[fullAttrPath]) != null && ref$.fieldType)) {
           (ref$ = this.model)[fullAttrPath] || (ref$[fullAttrPath] = {});
-          return this.model[fullAttrPath].fieldType = 'input.text';
+          return this.model[fullAttrPath].fieldType = this.getFieldTypeByAttrName(fullAttrPath);
+        }
+      },
+      getFieldTypeByAttrName: function(attr){
+        var last;
+        if (this.model[attr].type != null) {
+          return "input." + this.model[attr].type;
+        }
+        last = function(start, end){
+          return attr.substr(attr.length - start, attr.length - end).toLowerCase();
+        };
+        switch (false) {
+        case attr !== '_id':
+          return 'input.hidden';
+        case last(4, 1) !== 'time':
+          return 'input.datetime-local';
+        case last(5, 1) !== 'count':
+          return 'input.number';
+        case last(6, 1) !== 'amount':
+          return 'input.number';
+        default:
+          return 'input.text';
         }
       },
       isDirective: function(key){
