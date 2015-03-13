@@ -2,10 +2,12 @@ class Descriptions
   (@__model__)->
 
 
-  parse: (descriptions)->
-    @parse-labels descriptions.labels
-    @parse-placeholders descriptions.placeholders
-    @parse-tooltips descriptions.tooltips
+  parse: (descriptions, old-descriptions)->
+    if descriptions
+      @parse-labels descriptions.labels
+      @parse-placeholders descriptions.placeholders
+      @parse-tooltips descriptions.tooltips
+    @ <<< old-descriptions if old-descriptions
     @
 
   parse-labels: (labels)!-> for own let key, label of labels
@@ -31,12 +33,12 @@ class Descriptions
     [return key for key, description of @ when key isnt '__model__' and description.label is label]
 
 descriptions-parser = ->
-  parse: (descriptions, model)->
-    (new Descriptions model).parse descriptions
+  parse: (model, descriptions, old-descriptions)->
+    (new Descriptions model).parse descriptions, old-descriptions
 
 
 if define? # AMD
-  define 'descriptions-parser', ['model-parser'], descriptions-parser 
+  define 'descriptions-parser', ['model-parser', 'util'], descriptions-parser 
 else # other
   root = module?.exports ? @
   root.descriptions-parser = descriptions-parser model-parser

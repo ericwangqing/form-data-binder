@@ -7,7 +7,7 @@ edit-widget-dom-creator = (util)->
 
 if define? # a+运行时
   define 'edit-widget-dom-creator', ['util'], edit-widget-dom-creator 
-else # b-plus开发时
+else # 独立运行
   root = module?.exports ? @
   root.edit-widget-dom-creator = edit-widget-dom-creator!
 

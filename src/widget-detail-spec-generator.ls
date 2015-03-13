@@ -1,19 +1,18 @@
 widget-detail-spec-generator = (model-parser, descriptions-parser, appearance-parser)->
-  generate: ({@type, @label, @class, @folderable, model, descriptions, appearance, behaviors})->
-    @parse-model model
+  generate: (spec, @model, @descriptions)->
+    {@type, @label, @class, @folderable, model, descriptions, appearance, behaviors} = spec
+    @get-widget-name model
     @parse-descriptions descriptions
     @parse-appearance appearance
     @parse-behaviors behaviors
 
     @create-detail-spec!
 
-  parse-model: (spec)!-> 
-    @model-name = Object.keys spec .0
-    @name = "#{@type}_#{@model-name}"
-    @model = model-parser.parse @model-name, spec[@model-name]
+  get-widget-name: (model-name)!->  
+    @name = "#{@type}_#{model-name}"
 
-  parse-descriptions: (descriptions)!->
-    @descriptions = descriptions-parser.parse descriptions, @model-name, @model
+  parse-descriptions: (descriptions)!->if descriptions?
+    @descriptions = descriptions-parser.parse descriptions, @model, @descriptions
 
   parse-behaviors: (behaviors)!-> 
     @behaviors = {}

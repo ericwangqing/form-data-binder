@@ -151,7 +151,7 @@ util = ->
 
 if define? # a+运行时
   define 'util', [], util
-else # b-plus开发时
+else # 独立运行
   root = module?.exports ? @
   root.util = util!
 

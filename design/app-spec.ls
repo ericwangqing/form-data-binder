@@ -131,5 +131,5 @@ app-spec =
 
 if define? # a+运行时
   define 'app-spec', ['state', 'util'], (state, util)-> app-spec 
-else # b-plus开发时
+else # 独立运行
   module.exports = app-spec

@@ -6,10 +6,15 @@
     function Descriptions(__model__){
       this.__model__ = __model__;
     }
-    prototype.parse = function(descriptions){
-      this.parseLabels(descriptions.labels);
-      this.parsePlaceholders(descriptions.placeholders);
-      this.parseTooltips(descriptions.tooltips);
+    prototype.parse = function(descriptions, oldDescriptions){
+      if (descriptions) {
+        this.parseLabels(descriptions.labels);
+        this.parsePlaceholders(descriptions.placeholders);
+        this.parseTooltips(descriptions.tooltips);
+      }
+      if (oldDescriptions) {
+        import$(this, oldDescriptions);
+      }
       return this;
     };
     prototype.parseLabels = function(labels){
@@ -70,15 +75,20 @@
   }());
   descriptionsParser = function(){
     return {
-      parse: function(descriptions, model){
-        return new Descriptions(model).parse(descriptions);
+      parse: function(model, descriptions, oldDescriptions){
+        return new Descriptions(model).parse(descriptions, oldDescriptions);
       }
     };
   };
   if (typeof define != 'undefined' && define !== null) {
-    define('descriptions-parser', ['model-parser'], descriptionsParser);
+    define('descriptions-parser', ['model-parser', 'util'], descriptionsParser);
   } else {
     root = (ref$ = typeof module != 'undefined' && module !== null ? module.exports : void 8) != null ? ref$ : this;
     root.descriptionsParser = descriptionsParser(modelParser);
+  }
+  function import$(obj, src){
+    var own = {}.hasOwnProperty;
+    for (var key in src) if (own.call(src, key)) obj[key] = src[key];
+    return obj;
   }
 }).call(this);

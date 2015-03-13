@@ -1,10 +1,9 @@
 (function(){
-  require(['widget-detail-spec-generator', 'widgets-manager', 'widget-spec', 'form-manager', 'util'], function(widgetDetailSpecGenerator, widgetsManager, widgetSpec, formManager, util){
+  require(['app-engine', 'app-spec', 'form-manager'], function(appEngine, appSpec, formManager){
     return $(function(){
       var form;
-      window.detailSpec = widgetDetailSpecGenerator.generate(widgetSpec);
-      console.log(detailSpec);
-      form = $('form#assignment').append(widgetsManager.createWidgetDom(detailSpec));
+      appEngine.run(appSpec);
+      form = $('form#assignment').append(appEngine.widgets['create_assignment'].dom);
       return window.assignmentForm = formManager.create(form);
     });
   });

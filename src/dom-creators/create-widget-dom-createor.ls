@@ -1,6 +1,6 @@
 # 根据xxx.widget.detail.spec（json）对象，生成form中的fieldset对象。一个widget就对应到一个fieldset。
-create-widget-dom-creator = (util)->
-  create: (spec)->
+create-widget-dom-createor = (util)->
+  make: (spec)->
     @objects-divs-stack = []
     @format-name spec
 
@@ -126,8 +126,8 @@ create-widget-dom-creator = (util)->
 
 
 if define? # a+运行时
-  define 'create-widget-dom-creator', ['util'], create-widget-dom-creator 
+  define 'create-widget-dom-createor', ['util'], create-widget-dom-createor 
 else # 独立运行
   root = module?.exports ? @
-  root.create-widget-dom-creator = create-widget-dom-creator util
+  root.create-widget-dom-createor = create-widget-dom-createor!
 

@@ -2,22 +2,24 @@
   var widgetDetailSpecGenerator, root, ref$;
   widgetDetailSpecGenerator = function(modelParser, descriptionsParser, appearanceParser){
     return {
-      generate: function(arg$){
-        var model, descriptions, appearance, behaviors;
-        this.type = arg$.type, this.label = arg$.label, this['class'] = arg$['class'], this.folderable = arg$.folderable, model = arg$.model, descriptions = arg$.descriptions, appearance = arg$.appearance, behaviors = arg$.behaviors;
-        this.parseModel(model);
+      generate: function(spec, model, descriptions){
+        var appearance, behaviors;
+        this.model = model;
+        this.descriptions = descriptions;
+        this.type = spec.type, this.label = spec.label, this['class'] = spec['class'], this.folderable = spec.folderable, model = spec.model, descriptions = spec.descriptions, appearance = spec.appearance, behaviors = spec.behaviors;
+        this.getWidgetName(model);
         this.parseDescriptions(descriptions);
         this.parseAppearance(appearance);
         this.parseBehaviors(behaviors);
         return this.createDetailSpec();
       },
-      parseModel: function(spec){
-        this.modelName = Object.keys(spec)[0];
-        this.name = this.type + "_" + this.modelName;
-        this.model = modelParser.parse(this.modelName, spec[this.modelName]);
+      getWidgetName: function(modelName){
+        this.name = this.type + "_" + modelName;
       },
       parseDescriptions: function(descriptions){
-        this.descriptions = descriptionsParser.parse(descriptions, this.modelName, this.model);
+        if (descriptions != null) {
+          this.descriptions = descriptionsParser.parse(descriptions, this.model, this.descriptions);
+        }
       },
       parseBehaviors: function(behaviors){
         var i$, own$ = {}.hasOwnProperty;
