@@ -129,5 +129,5 @@ if define? # a+运行时
   define 'create-widget-dom-creator', ['util'], create-widget-dom-creator 
 else # b-plus开发时
   root = module?.exports ? @
-  root.create-widget-dom-creator = create-widget-dom-creator!
+  root.create-widget-dom-creator = create-widget-dom-creator util
 

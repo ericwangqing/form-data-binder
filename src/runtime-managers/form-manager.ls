@@ -136,7 +136,7 @@ form-manager = (form-data = @form-data)->
 
 
 if define? # AMD
-  define 'form-manger', [], (form-data)-> form-manger form-data
+  define 'form-manager', ['form-data'], form-manager
 else # other
   root = module?.exports ? @
   root.form-manager = form-manager form-data

@@ -1,4 +1,4 @@
-widget-detail-spec-generator = ->
+widget-detail-spec-generator = (model-parser, descriptions-parser, appearance-parser)->
   generate: ({@type, @label, @class, @folderable, model, descriptions, appearance, behaviors})->
     @parse-model model
     @parse-descriptions descriptions

@@ -1,6 +1,6 @@
 (function(){
   var widgetDetailSpecGenerator, root, ref$;
-  widgetDetailSpecGenerator = function(){
+  widgetDetailSpecGenerator = function(modelParser, descriptionsParser, appearanceParser){
     return {
       generate: function(arg$){
         var model, descriptions, appearance, behaviors;

@@ -14,7 +14,7 @@ widgets-manager = (create-widget-dom-creator, edit-widget-dom-creator, view-widg
 
 
 if define? # AMD
-  define widgets-manager, ['create-widget-dom-creator', 'edit-widget-dom-creator', 'view-widget-dom-creator', 'list-widgets-dom-creator'], widgets-manager 
+  define 'widgets-manager', ['create-widget-dom-creator', 'edit-widget-dom-creator', 'view-widget-dom-creator', 'list-widgets-dom-creator'], widgets-manager 
 else # other
   root = module?.exports ? @
   root.widgets-manager = widgets-manager create-widget-dom-creator, edit-widget-dom-creator, view-widget-dom-creator, list-widgets-dom-creator

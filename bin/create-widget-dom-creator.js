@@ -209,6 +209,6 @@
     define('create-widget-dom-creator', ['util'], createWidgetDomCreator);
   } else {
     root = (ref$ = typeof module != 'undefined' && module !== null ? module.exports : void 8) != null ? ref$ : this;
-    root.createWidgetDomCreator = createWidgetDomCreator();
+    root.createWidgetDomCreator = createWidgetDomCreator(util);
   }
 }).call(this);

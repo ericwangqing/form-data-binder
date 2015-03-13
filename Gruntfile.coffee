@@ -52,6 +52,7 @@ module.exports = (grunt) ->
         bare: false
       all:
         expand: true
+        flatten: true
         cwd: "src/"
         src: ['**/**.ls']
         dest: "bin/"

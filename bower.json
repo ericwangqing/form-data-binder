@@ -3,9 +3,17 @@
   "main": "form-data-binder.js",
   "location": "bin",
   "version": "0.0.1",
-  "devDependencies": {},
-  "moduleType": ["node"],
-  "keywords": ["form", "data", "bind"],
+  "devDependencies": {
+    "requirejs": "~2.1.16"
+  },
+  "moduleType": [
+    "node"
+  ],
+  "keywords": [
+    "form",
+    "data",
+    "bind"
+  ],
   "license": "MIT",
   "private": false,
   "ignore": [

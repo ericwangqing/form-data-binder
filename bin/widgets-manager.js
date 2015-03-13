@@ -29,7 +29,7 @@
     };
   };
   if (typeof define != 'undefined' && define !== null) {
-    define(widgetsManager, ['create-widget-dom-creator', 'edit-widget-dom-creator', 'view-widget-dom-creator', 'list-widgets-dom-creator'], widgetsManager);
+    define('widgets-manager', ['create-widget-dom-creator', 'edit-widget-dom-creator', 'view-widget-dom-creator', 'list-widgets-dom-creator'], widgetsManager);
   } else {
     root = (ref$ = typeof module != 'undefined' && module !== null ? module.exports : void 8) != null ? ref$ : this;
     root.widgetsManager = widgetsManager(createWidgetDomCreator, editWidgetDomCreator, viewWidgetDomCreator, listWidgetsDomCreator);

@@ -231,9 +231,7 @@
     };
   };
   if (typeof define != 'undefined' && define !== null) {
-    define('form-manger', [], function(formData){
-      return formManger(formData);
-    });
+    define('form-manager', ['form-data'], formManager);
   } else {
     root = (ref$ = typeof module != 'undefined' && module !== null ? module.exports : void 8) != null ? ref$ : this;
     root.formManager = formManager(formData);
