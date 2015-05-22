@@ -1,77 +1,107 @@
 (function(){
-  var pathDelimiter, pathValidationRegex, arrayKeyRegex, formData, root, ref$;
+  var pathDelimiter, pathValidationRegex, formData, root, ref$;
   pathDelimiter = '.';
-  pathValidationRegex = /^[a-zA-Z0-9.[\]]+$/;
-  arrayKeyRegex = /(.+)\[(\d+)\]$/;
-  formData = function(FormArrayContainer){
+  pathValidationRegex = /^[_a-zA-Z0-9.[\]]+$/;
+  formData = function(){
     return {
       f2d: function(form, data){
         var nameValuePairs;
         data == null && (data = {});
         this.form = $(form);
-        nameValuePairs = this.form.serializeArray();
+        nameValuePairs = this.getNameValuePairs();
         return this.buildData(nameValuePairs, data);
       },
+      getNameValuePairs: function(){
+        var result;
+        result = [];
+        this.form.find('[name][type!=checkbox]').each(function(){
+          var value;
+          if (this.tagName.toLowerCase() !== 'div') {
+            value = $(this).val();
+            if (value != null) {
+              return result.push({
+                name: $(this).attr('name'),
+                value: value
+              });
+            }
+          }
+        });
+        return result = result.concat(this.getCheckboxValue());
+      },
+      getCheckboxValue: function(){
+        var result, name, value;
+        result = {};
+        this.form.find('[type=checkbox]').each(function(){
+          var $checkbox, key$;
+          $checkbox = $(this);
+          if ($checkbox.is(':checked')) {
+            return (result[key$ = $checkbox.attr('name')] || (result[key$] = [])).push($checkbox.attr('value'));
+          }
+        });
+        return result = (function(){
+          var ref$, own$ = {}.hasOwnProperty, results$ = [];
+          for (name in ref$ = result) if (own$.call(ref$, name)) {
+            value = ref$[name];
+            results$.push({
+              name: name,
+              value: value.join(',')
+            });
+          }
+          return results$;
+        }());
+      },
       buildData: function(pairs, data){
-        var i$, len$, ref$, name, value;
+        var i$, len$, pair;
         for (i$ = 0, len$ = pairs.length; i$ < len$; ++i$) {
-          ref$ = pairs[i$], name = ref$.name, value = ref$.value;
-          this.setDataValue(name, value, data);
+          pair = pairs[i$];
+          this.setDataValue(pair.name, pair.value, data);
         }
         return data;
       },
       setDataValue: function(path, value, data){
-        var keys, lastKey, i$, len$, key;
+        var levels, i$, len$, i, level, matches, __all__, attr, index, results$ = [];
         path = path.trim();
-        if (!pathValidationRegex.test(path)) {
-          throw new Error("path: '" + path + "'' is invalid");
-        }
-        keys = path.split(pathDelimiter);
-        lastKey = keys.pop();
-        for (i$ = 0, len$ = keys.length; i$ < len$; ++i$) {
-          key = keys[i$];
-          data = this.setDataKey(data, key);
-        }
-        return this.setFinalValue(data, lastKey, value);
-      },
-      setDataKey: function(data, key){
-        var matches, ref$, __all__, index;
-        matches = key.match(arrayKeyRegex);
-        if (!matches) {
-          return (ref$ = data[key]) != null
-            ? ref$
-            : data[key] = {};
-        } else {
-          __all__ = matches[0], key = matches[1], index = matches[2];
-          return this.setArrayValue(data, key, index, {});
-        }
-      },
-      setFinalValue: function(data, key, value){
-        var matches, __all__, index;
-        matches = key.match(arrayKeyRegex);
-        if (!matches) {
-          if (data[key] != null) {
-            throw new Error("value can't be set as " + value + " since it has already been set as: " + obj[attr]);
+        levels = path.split(pathDelimiter);
+        for (i$ = 0, len$ = levels.length; i$ < len$; ++i$) {
+          i = i$;
+          level = levels[i$];
+          matches = level.match(/(.+)\[(\d+)\]$/);
+          if (!matches) {
+            results$.push(data = this.setObjectValue(data, level, value, this.getNextLevel(levels, i)));
+          } else {
+            __all__ = matches[0], attr = matches[1], index = matches[2];
+            results$.push(data = this.setArrayValue(data, attr, index, value, this.getNextLevel(levels, i)));
           }
-          return data[key] = value;
+        }
+        return results$;
+      },
+      getNextLevel: function(levels, i){
+        if (i === levels.length - 1) {
+          return null;
         } else {
-          __all__ = matches[0], key = matches[1], index = matches[2];
-          return this.setArrayValue(data, key, index, value);
+          return {};
         }
       },
-      getSplitArrayKey: function(key){
-        return key.split(/[\[\]]+/).filter(function(it){
-          return it;
-        });
-      },
-      setArrayValue: function(data, key, index, value){
-        var array, ref$, i$, len$, i;
-        if (data[key] != null && !Array.isArray(data[key])) {
-          throw new Error(key + " of object: " + data + " should be an array");
+      setObjectValue: function(obj, attr, value, nextLevel){
+        if ((obj != null ? obj[attr] : void 8) != null && !nextLevel) {
+          throw new Error("value can't be set as " + value + " since it has already been set as: " + obj[attr]);
         }
-        array = (ref$ = data[key]) != null
-          ? ref$
-          : data[key] = [];
+        return obj[attr] = nextLevel || value;
+      },
+      setArrayValue: function(obj, attr, index, value, nextLevel){
+        var ref$;
+        if (((ref$ = obj[attr]) != null ? ref$[index] : void 8) != null && !nextLevel) {
+          throw new Error("value can't be set as " + value + " since it has already been set as: " + obj[attr][index]);
+        }
+        value = nextLevel || value;
+        return this.setArrayValueToIndex(obj, attr, index, value);
+      },
+      setArrayValueToIndex: function(obj, attr, index, value){
+        var array, i$, ref$, len$, i;
+        if (obj[attr] != null && !Array.isArray(obj[attr])) {
+          throw new Error(attr + " of object: " + obj + " should be an array");
+        }
+        array = obj[attr] || (obj[attr] = []);
         for (i$ = 0, len$ = (ref$ = (fn$())).length; i$ < len$; ++i$) {
           i = ref$[i$];
           if (typeof array[i] === 'undefined') {
@@ -88,70 +118,84 @@
         }
       },
       d2f: function(data, form){
-        if (form) {
-          this.form = $(form);
-        }
+        this.form = form;
         this.setFormWithData(data, '');
       },
       setFormWithData: function(data, path){
         if (Array.isArray(data)) {
-          this.setFormWithArray(data, path);
-        } else {
+          if (this.isThirdPartyWidget(path)) {
+            this.setFieldValue(data, path);
+          } else {
+            this.setFormWithArray(data, path);
+          }
+        } else if (typeof data === 'object') {
           this.setFormWithObject(data, path);
+        } else {
+          this.setFieldValue(data, path);
         }
       },
       setFormWithArray: function(data, path){
-        var container, amountOfArrayItemsNeedAdded, i$, ref$, len$, i, index, value, newPath;
-        container = this.form.find('[name="#{path}"]');
-        if (!container.hasClass('array-container')) {
-          throw new Error(path + " is an array but can't find its array-container");
+        var container, i$, len$, index, value, newPath;
+        container = this.form.find("[name=\"" + path + "\"]");
+        if (container.length === 0) {
+          console.warn("can't find " + path);
         }
-        container = new FormArrayContainer(container);
-        amountOfArrayItemsNeedAdded = data.length - container.getLength();
-        for (i$ = 0, len$ = (ref$ = (fn$())).length; i$ < len$; ++i$) {
-          i = ref$[i$];
-          container.addArrayItem();
+        if (!container.hasClass('array-container')) {
+          console.warn(path + " is an array but can't find its array-container");
         }
         for (i$ = 0, len$ = data.length; i$ < len$; ++i$) {
           index = i$;
           value = data[i$];
           newPath = path + "[" + index + "]";
-          if (this.form.find("[name=\"" + newPath + "\"]").length === 0) {
-            throw new Error("can't find " + newPath);
-          }
           this.setFormWithData(value, newPath);
-        }
-        function fn$(){
-          var i$, to$, results$ = [];
-          for (i$ = 1, to$ = amountOfArrayItemsNeedAdded; i$ <= to$; ++i$) {
-            results$.push(i$);
-          }
-          return results$;
         }
       },
       setFormWithObject: function(data, path){
         var key, value, newPath;
-        if (typeof data !== 'object') {
-          this.form.find("[name=\"" + path + "\"]").val(data);
-        } else {
-          for (key in data) {
-            value = data[key];
-            newPath = path === ''
-              ? key
-              : path + "." + key;
-            if (this.form.find('[name="#{new-path}"]').length === 0) {
-              throw new Error("can't find " + newPath);
-            }
-            this.setFormWithData(value, newPath);
-          }
+        if (data == null) {
+          return;
         }
+        for (key in data) {
+          value = data[key];
+          newPath = path === ''
+            ? key
+            : path + "." + key;
+          this.setFormWithData(value, newPath);
+        }
+      },
+      setFieldValue: function(data, path){
+        var $control;
+        $control = this.form.find("[name='" + path + "']");
+        if ($control.length === 0) {
+          return console.warn("can't find " + path);
+        }
+        if ($control.is('select')) {
+          this.setSelectValue($control, data);
+        } else if ($control.is('[type=checkbox]')) {
+          this.setCheckboxValue($control, data);
+        } else {
+          $control.val(data);
+        }
+      },
+      isThirdPartyWidget: function(path){
+        this.form.find("[name='" + path + "']").is('input select');
+        return false;
+      },
+      setSelectValue: function(select, data){
+        var selectizer;
+        selectizer = select.selectize()[0].selectize;
+        selectizer.clear();
+        selectizer['@set-value'](data);
+      },
+      setCheckboxValue: function(checkbox, data){
+        checkbox.trigger('set-value', data);
       }
     };
   };
   if (typeof define != 'undefined' && define !== null) {
-    define('form-data', ['Form-array-container'], formData);
+    define('form-data', [], formData);
   } else {
     root = (ref$ = typeof module != 'undefined' && module !== null ? module.exports : void 8) != null ? ref$ : this;
-    root.formData = formData(root.FormArrayContainer);
+    root.formData = formData();
   }
 }).call(this);

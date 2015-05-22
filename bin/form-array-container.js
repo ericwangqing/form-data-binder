@@ -1,96 +1,51 @@
 (function(){
-  var restrictionRegex, FormArrayContainer, root, ref$, slice$ = [].slice;
-  restrictionRegex = /\[(\d+).+([\d*]+)]/;
+  var restrictionRegex, FormArrayContainer, root, ref$;
+  restrictionRegex = /\[(\d+).+([\d*]+)\]/;
   FormArrayContainer = (function(){
     FormArrayContainer.displayName = 'FormArrayContainer';
     var prototype = FormArrayContainer.prototype, constructor = FormArrayContainer;
-    function FormArrayContainer(container){
-      this.container = $(container);
-    }
-    prototype.init = function(){
-      var ref$;
-      ref$ = this.parseRestriction(), this.min = ref$.min, this.max = ref$.max;
-      this.insertAddingItemButton();
-      this.insertRemovingItemButtons();
-      this.addUpToMiniumItems();
-      this.showOrHideAddingRemovingButtons();
-    };
-    prototype.addUpToMiniumItems = function(){
-      var length, i$, ref$, len$, i;
-      length = this.getLength();
-      if (length < this.min && this.min > 1) {
-        for (i$ = 0, len$ = (ref$ = (fn$())).length; i$ < len$; ++i$) {
-          i = ref$[i$];
-          this.addArrayItem();
-        }
+    FormArrayContainer.containers = [];
+    FormArrayContainer.afterRenderCb = [];
+    FormArrayContainer.renderContainer = function(dom, isEditable){
+      var $dom, containers, i$, len$, container, ref$, cb;
+      $dom = $(dom);
+      containers = $dom.find('.a-plus.array-container');
+      for (i$ = 0, len$ = containers.length; i$ < len$; ++i$) {
+        container = containers[i$];
+        container = new this(container, isEditable);
+        this.containers.push(container);
+        container.render();
       }
-      function fn$(){
-        var i$, to$, results$ = [];
-        for (i$ = length, to$ = min; i$ <= to$; ++i$) {
-          results$.push(i$);
-        }
-        return results$;
+      for (i$ = 0, len$ = (ref$ = this.afterRenderCb).length; i$ < len$; ++i$) {
+        cb = ref$[i$];
+        cb($dom);
+      }
+    };
+    function FormArrayContainer(container, isEditable){
+      this.isEditable = isEditable;
+      this.container = $(container);
+      this.name = this.container.attr('name');
+    }
+    prototype.render = function(){
+      var ref$;
+      if (!this.isEditable) {
+        this.saveTemplate();
+      } else {
+        ref$ = this.parseRestriction(), this.min = ref$.min, this.max = ref$.max;
+        this.insertAddingItemButton();
+        this.insertRemovingItemButtons();
+        this.addEventToAddRemoveButton();
+        this.saveTemplate();
+        this.addUpToMiniumItems();
+        this.showOrHideAddingRemovingButtons();
       }
     };
     prototype.insertAddingItemButton = function(){
-      var addButton, noAddButton, this$ = this;
-      addButton = this.container.children('button.a-plus.add-array-item');
-      if (noAddButton = addButton.length === 0) {
-        addButton = $('<button>').addClass('a-plus add-array-item').html(' + ');
-      }
-      addButton.click(function(event){
-        this$.clickingButtonToAddArrayItem();
-        return false;
-      });
-      if (noAddButton) {
-        this.container.prepend(addButton);
-      }
-    };
-    prototype.clickingButtonToAddArrayItem = function(){
-      var item;
-      if (this.getLength() === 0) {
-        item = this.getArrayItem();
-        this.changeFieldsName(item.show(), 'name');
-        this.setLength(1);
-      } else {
-        this.addArrayItem();
-      }
-      this.showOrHideAddingRemovingButtons();
-    };
-    prototype.addArrayItem = function(afterItemAdd){
-      var item, newItem;
-      item = this.getArrayItem().get(0);
-      newItem = $(item).clone();
-      this.cleanArrayItemInContainer(newItem);
-      this.increaseIndexAndLength(newItem);
-      this.insertRemovingItemButton(newItem);
-      this.container.append(newItem);
-      if (typeof afterItemAdd === 'function') {
-        afterItemAdd(this.container, newItem);
-      }
-    };
-    prototype.cleanArrayItemInContainer = function(item){
-      var i$, ref$, len$, container, arrayItem, j$, ref1$, len1$, i;
-      for (i$ = 0, len$ = (ref$ = item.find('.array-container')).length; i$ < len$; ++i$) {
-        container = ref$[i$];
-        container = new FormArrayContainer(container);
-        arrayItem = container.getArrayItem();
-        if (arrayItem.length > 1) {
-          for (j$ = 0, len1$ = (ref1$ = (fn$())).length; j$ < len1$; ++j$) {
-            i = ref1$[j$];
-            arrayItem[i].remove();
-          }
-        }
-        container.setLength(1);
-        container.init();
-      }
-      return item.find('input').val('');
-      function fn$(){
-        var i$, to$, results$ = [];
-        for (i$ = 1, to$ = arrayItem.length - 1; i$ <= to$; ++i$) {
-          results$.push(i$);
-        }
-        return results$;
+      var $addButton, noAddButton;
+      $addButton = this.container.children('.a-plus.add-array-item');
+      if (noAddButton = $addButton.length === 0) {
+        $addButton = $('<i>').addClass('plus icon a-plus add-array-item');
+        this.container.prepend($addButton);
       }
     };
     prototype.insertRemovingItemButtons = function(){
@@ -101,58 +56,78 @@
         this.insertRemovingItemButton($(item));
       }
     };
-    prototype.insertRemovingItemButton = function(item){
-      var removeButton, noRemoveButton, this$ = this;
-      removeButton = item.children('button.a-plus.remove-array-item');
-      if (noRemoveButton = removeButton.length === 0) {
-        removeButton = $('<button>').addClass('a-plus remove-array-item').html(' × ');
+    prototype.insertRemovingItemButton = function($item){
+      var $removeButton, noRemoveButton;
+      $removeButton = $item.children('.a-plus.remove-array-item');
+      if (noRemoveButton = $removeButton.length === 0) {
+        $removeButton = $('<i>').addClass('remove icon a-plus remove-array-item');
+        $item.prepend($removeButton);
       }
-      removeButton.click(function(event){
-        this$.clickingButtonToRemoveArrayItem(event.target);
+    };
+    prototype.saveTemplate = function(){
+      this.template = $(this.getArrayItem().get(0)).clone();
+      this.template.removeClass('array-item');
+      this.renameAttr(this.template, 'name', '__name__');
+    };
+    prototype.addUpToMiniumItems = function(){
+      while (this.getLength() < this.min) {
+        this.addArrayItem();
+      }
+    };
+    prototype.addArrayItem = function(){
+      var $newItem;
+      $newItem = this.getItemFromTemplate();
+      this.container.append($newItem);
+      this.increaseIndexAndLength($newItem);
+      this.showOrHideAddingRemovingButtons();
+      constructor.renderContainer($newItem, this.isEditable);
+    };
+    prototype.addEventToAddRemoveButton = function(){
+      var self;
+      self = this;
+      this.container.children('.a-plus.add-array-item').click(function(){
+        self.clickingButtonToAddArrayItem(this);
         return false;
       });
-      if (noRemoveButton) {
-        item.prepend(removeButton);
-      }
+      this.getArrayItem().children('.a-plus.remove-array-item').click(function(){
+        self.clickingButtonToRemoveArrayItem(this);
+        return false;
+      });
+    };
+    prototype.clickingButtonToAddArrayItem = function(button){
+      this.addArrayItem();
     };
     prototype.clickingButtonToRemoveArrayItem = function(button){
-      var item;
-      item = $(button).closest('.a-plus.array-item');
-      if (this.getLength() > 1) {
-        item.remove();
-        this.decreaseIndexAndLength();
-      } else {
-        this.changeFieldsName(item.hide(), '_name_');
-        this.setLength(0);
-      }
+      $(button).closest('.a-plus.array-item').remove();
+      this.decreaseIndexAndLength();
       this.showOrHideAddingRemovingButtons();
     };
-    prototype.increaseIndexAndLength = function(newItem){
+    prototype.increaseIndexAndLength = function($newItem){
       var newItemIndex;
       newItemIndex = this.getLength();
-      this.updateItemIndex(newItem, newItemIndex);
+      this.updateItemIndex($newItem, newItemIndex);
       this.setLength(newItemIndex + 1);
     };
     prototype.decreaseIndexAndLength = function(){
-      var items, i$, len$, index, item;
-      items = this.getArrayItem();
-      for (i$ = 0, len$ = items.length; i$ < len$; ++i$) {
+      var $items, i$, len$, index, item;
+      $items = this.getArrayItem();
+      for (i$ = 0, len$ = $items.length; i$ < len$; ++i$) {
         index = i$;
-        item = items[i$];
-        this.updateItemIndex(item, index);
+        item = $items[i$];
+        this.updateItemIndex($(item), index);
       }
       this.setLength(this.getLength() - 1);
     };
-    prototype.updateItemIndex = function(item, index){
+    prototype.updateItemIndex = function($item, index){
       var oldItemName, newItemName, fields, i$, len$, field;
-      oldItemName = $(item).attr('name') || $(item).children('[name]').attr('name');
-      newItemName = slice$.call(oldItemName, 0, -4 + 1 || 9e9).join('') + ("[" + index + "]");
-      fields = $(item).find('[name]');
+      oldItemName = $item.attr('name') || $item.children('[name]').attr('name');
+      newItemName = oldItemName.match(/(.*)\[\d*\]$/)[1] + ("[" + index + "]");
+      fields = $item.find('[name]');
       for (i$ = 0, len$ = fields.length; i$ < len$; ++i$) {
         field = fields[i$];
         this.updateName($(field), oldItemName, newItemName);
       }
-      this.updateName(item, oldItemName, newItemName);
+      this.updateName($item, oldItemName, newItemName);
     };
     prototype.updateName = function(dom, oldItemName, newItemName){
       var oldName, newName;
@@ -162,10 +137,10 @@
       }
     };
     prototype.showOrHideAddingRemovingButtons = function(){
-      var length, removes, adds;
+      var length, adds, removes;
       length = this.getLength();
-      removes = this.container.children('.array-item').children('button.a-plus.remove-array-item');
-      adds = this.container.children('button.a-plus.add-array-item');
+      adds = this.container.children('.a-plus.add-array-item');
+      removes = this.getArrayItem().children('.a-plus.remove-array-item');
       switch (false) {
       case length !== this.min:
         removes.hide();
@@ -180,13 +155,6 @@
         adds.hide();
       }
     };
-    prototype.changeFieldsName = function(item, _to){
-      var from;
-      from = _to === '_name_' ? 'name' : '_name_';
-      item.find("[" + from + "]").each(function(){
-        return $(this).attr(_to, $(this).attr(from)).removeAttr(from);
-      });
-    };
     prototype.getLength = function(){
       return parseInt(this.container.attr('data-a-plus-length'));
     };
@@ -195,6 +163,25 @@
     };
     prototype.getArrayItem = function(){
       return this.container.children('.a-plus.array-item');
+    };
+    prototype.renameAttr = function(dom, oldName, newName){
+      $(dom).find("[" + oldName + "]").each(function(){
+        var $item;
+        $item = $(this);
+        $item.attr(newName, $item.attr(oldName));
+        $item.removeAttr(oldName);
+      });
+    };
+    prototype.getItemFromTemplate = function(){
+      var self, $item;
+      self = this;
+      $item = this.template.clone().addClass('array-item');
+      this.renameAttr($item, '__name__', 'name');
+      $item.children('.a-plus.remove-array-item').click(function(){
+        self.clickingButtonToRemoveArrayItem(this);
+        return false;
+      });
+      return $item;
     };
     prototype.parseRestriction = function(){
       var restriction, ref$, __all__, min, max;

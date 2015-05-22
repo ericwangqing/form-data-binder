@@ -2,11 +2,12 @@ head
   title form-data-binder-driven-case
   meta(charset='utf-8')
   link(rel='stylesheet', href='index.css')
+  link(rel='stylesheet', href='vendor/semantic/dist/semantic.css')
   script(src='vendor/jquery/jquery.js')
   script(src='form-array-container.js')
   script(src='form-data.js')
   script(src='form-manager.js')
-  script(src='local-recoverier.js')
+  //- script(src='local-recoverier.js')
   script(src='index.js')
   //- script(src='//localhost:35729/livereload.js')
 
@@ -31,19 +32,33 @@ body
       .a-plus.array-item
         input(type='text' name='forStudents[0]')
 
-    .a-plus.array-container(name='submissions' data-a-plus-restriction='[0, 2]' data-a-plus-length='1')
+    .a-plus.array-container(name='submissions' data-a-plus-restriction='[0, 4]' data-a-plus-length='1')
       label 交付件列表
       .a-plus.array-item.object(name='submissions[0]')
         fieldset
           legend 交付件
           label 名称
           input(type='text', name='submissions[0].name')
-          .a-plus.array-container(name='submissions[0].type' data-a-plus-restriction='[1, *]' data-a-plus-length='1')
+          .a-plus.array-container(name='submissions[0].type' data-a-plus-restriction='[3, *]' data-a-plus-length='1')
             label 文件格式
             .a-plus.array-item
               input(type='text' name='submissions[0].type[0]')
           label 要求
           input(type='text' name='submissions[0].description')
+
+    .a-plus.array-container(name='nonono' data-a-plus-restriction='[0, 4]' data-a-plus-length='1')
+      label nono列表
+      .a-plus.array-item.object(name='nonono[0]')
+        fieldset
+          legend nono件
+          label nono名称
+          input(type='text', name='nonono[0].name')
+          .a-plus.array-container(name='nonono[0].type' data-a-plus-restriction='[3, *]' data-a-plus-length='1')
+            label nono格式
+            .a-plus.array-item
+              input(type='text' name='nonono[0].type[0]')
+          label nono要求
+          input(type='text' name='nonono[0].description')
 
   //- formatted form
     1）必须加入.a-plus.array-container标记 array，用data-a-plus-length记录array的length
